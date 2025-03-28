@@ -22,6 +22,7 @@ namespace FinalProject.DbModel
         public DbSet<Cart> Cart { get; set; }
         public DbSet<PaymentRecord> PaymentRecords { get; set; }
         public DbSet<UserFilter> UserFilters { get; set; }
+        public DbSet<MailCheck>  MailChecks { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -108,6 +109,20 @@ namespace FinalProject.DbModel
                 .WithMany(u => u.Filters)
                 .HasForeignKey(uf => uf.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<MailCheck>()
+                .HasKey(m => m.Id);
+
+            modelBuilder.Entity<MailCheck>()
+                .Property(m => m.Email)
+                .IsRequired();
+
+            modelBuilder.Entity<MailCheck>()
+                .HasOne(m => m.User)            // Один MailCheck принадлежит одному пользователю
+                .WithMany(u => u.MailChecks)    // Один пользователь владеет многими MailCheck
+                .HasForeignKey(m => m.UserId)   // Связь через поле UserId
+                .OnDelete(DeleteBehavior.Restrict); // У
+            
         }
 
 
