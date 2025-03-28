@@ -23,7 +23,7 @@ namespace FinalProject.DbModel
         public DbSet<PaymentRecord> PaymentRecords { get; set; }
         public DbSet<UserFilter> UserFilters { get; set; }
         public DbSet<MailCheck>  MailChecks { get; set; }
-
+        public DbSet<MailMessage> MailMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -118,10 +118,13 @@ namespace FinalProject.DbModel
                 .IsRequired();
 
             modelBuilder.Entity<MailCheck>()
-                .HasOne(m => m.User)            // Один MailCheck принадлежит одному пользователю
-                .WithMany(u => u.MailChecks)    // Один пользователь владеет многими MailCheck
-                .HasForeignKey(m => m.UserId)   // Связь через поле UserId
-                .OnDelete(DeleteBehavior.Restrict); // У
+                .HasOne(m => m.User)            
+                .WithMany(u => u.MailChecks)    
+                .HasForeignKey(m => m.UserId)   
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MailMessage>()
+                .HasIndex(m => new { m.UniqueId, m.UserId })
+                .IsUnique();
             
         }
 
