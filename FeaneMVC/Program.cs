@@ -1,3 +1,4 @@
+using FeaneMVC.Repository;
 using FinalProject.DbModel;
 using FinalProject.Models;
 using FoodShop.Repository;
@@ -9,20 +10,20 @@ using WebApplication1.Repository;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Добавление сервисов
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddHttpContextAccessor();
 
-// Настройка сессий
-builder.Services.AddDistributedMemoryCache(); // Для хранения данных сессий в памяти
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+builder.Services.AddDistributedMemoryCache(); // пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 builder.Services.AddSession(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(30); // Время жизни сессии
-    options.Cookie.HttpOnly = true; // Доступность сессии только через HTTP
-    options.Cookie.IsEssential = true; // Обязательность cookie
+    options.IdleTimeout = TimeSpan.FromMinutes(30); // пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
+    options.Cookie.HttpOnly = true; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ HTTP
+    options.Cookie.IsEssential = true; // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ cookie
 });
 builder.Services.AddScoped<AdminOrModeratorModeAttribute>();
 builder.Services.AddScoped<AdminModeAttribute>();
@@ -44,7 +45,7 @@ builder.Services.AddScoped<WebApplication1.Interfaces.ISession, SessionRepositor
 
 var app = builder.Build();
 
-// Настройка конвейера обработки HTTP-запросов
+// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ HTTP-пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -54,7 +55,7 @@ if (!app.Environment.IsDevelopment())
 //app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
-app.UseSession(); // Добавляем поддержку сессий
+app.UseSession(); // пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ
 app.UseAuthorization();
 
 app.MapControllerRoute(

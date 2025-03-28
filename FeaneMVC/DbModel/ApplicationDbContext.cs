@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using FeaneMVC.Models;
+using Microsoft.EntityFrameworkCore;
 using FinalProject.Models;
 using WebApplication1.Models;
 
@@ -20,6 +21,8 @@ namespace FinalProject.DbModel
         public DbSet<DeliveryAddress> DeliveryAddresses { get; set; }
         public DbSet<Cart> Cart { get; set; }
         public DbSet<PaymentRecord> PaymentRecords { get; set; }
+        public DbSet<UserFilter> UserFilters { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -99,6 +102,12 @@ namespace FinalProject.DbModel
 
             modelBuilder.Entity<PaymentRecord>()
              .HasKey(pr => pr.Id);
+            
+            modelBuilder.Entity<UserFilter>()
+                .HasOne(uf => uf.User)
+                .WithMany(u => u.Filters)
+                .HasForeignKey(uf => uf.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
 
