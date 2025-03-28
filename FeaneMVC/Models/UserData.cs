@@ -1,6 +1,7 @@
 ﻿using FinalProject.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
+using FeaneMVC.Models;
 using WebApplication1.Models.Enums;
 using WebApplication1.Models.Response;
 
@@ -46,5 +47,6 @@ namespace WebApplication1.Models
         // Связь с DeliveryAddress
         public Guid DeliveryId { get; set; }
         public virtual DeliveryAddress Delivery { get; set; } // Навигационное свойство
+        public virtual ICollection<UserFilter> Filters { get; set; }
     }
 }

@@ -1,0 +1,403 @@
+@model List<string>
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filters Form</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --background: #f8fafc;
+            --card-bg: rgba(255, 255, 255, 0.8);
+            --text: #1e293b;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --radius: 0.5rem;
+            --transition: all 0.3s ease;
+        }
+
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .card-header {
+            padding: 1.5rem 1.5rem 0.5rem;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+        }
+
+        .filter-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .filter-field {
+            display: flex;
+            gap: 0.5rem;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+        }
+
+        .remove-btn {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            width: 2.5rem;
+            height: 2.5rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .remove-btn:hover {
+            background: #f1f5f9;
+            color: #ef4444;
+        }
+
+        .remove-btn svg {
+            width: 1rem;
+            height: 1rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: var(--transition);
+            border: none;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn svg {
+            width: 1rem;
+            height: 1rem;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover svg {
+            transform: rotate(90deg);
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1rem;
+            right: 1rem;
+            padding: 1rem 1.5rem;
+            background: white;
+            color: var(--text);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1000;
+            max-width: 350px;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid #10b981;
+        }
+
+        .toast.error {
+            border-left: 4px solid #ef4444;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: #64748b;
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @@media (prefers-color-scheme: dark) {
+        :root {
+            --background: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.8);
+            --text: #f1f5f9;
+            --border: #334155;
+            --shadow: rgba(0, 0, 0, 0.3);
+        }
+
+        body {
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+        }
+
+        .remove-btn:hover {
+            background: #334155;
+        }
+
+        .btn-outline:hover {
+            background: #1e293b;
+            border-color: #475569;
+        }
+
+        .toast {
+            background: #1e293b;
+        }
+        }
+    </style></head>
+<body>
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h2 class="card-title">Enter Your Filters</h2>
+        </div>
+        <div class="card-content">
+            <form id="filters-form">
+                <div id="filter-fields" class="filter-fields">
+                    <div class="filter-field">
+                        <input type="text" name="filters" class="input" placeholder="Enter filter" />
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" id="add-filter-btn" class="btn btn-outline">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="5" x2="12" y2="19"></line>
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Add More
+                    </button>
+                    <button type="button" id="submit-btn" class="btn btn-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                        Submit
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div id="toast" class="toast">
+    <div class="toast-title">Notification</div>
+    <div id="toast-message" class="toast-message"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterFields = document.getElementById('filter-fields');
+        const addFilterBtn = document.getElementById('add-filter-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        // Add a new filter field
+        addFilterBtn.addEventListener('click', function() {
+            const filterField = document.createElement('div');
+            filterField.className = 'filter-field';
+            filterField.innerHTML = `
+                    <input type="text" name="filters" class="input" placeholder="Enter filter" />
+                    <button type="button" class="remove-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"></line>
+                            <line x1="6" y1="6" x2="18" y2="18"></line>
+                        </svg>
+                    </button>
+                `;
+            filterFields.appendChild(filterField);
+
+            // Add event listener to the remove button
+            const removeBtn = filterField.querySelector('.remove-btn');
+            removeBtn.addEventListener('click', function() {
+                filterField.style.opacity = '0';
+                filterField.style.height = '0';
+                setTimeout(() => {
+                    filterField.remove();
+                }, 300);
+            });
+
+            // Focus the new input
+            const input = filterField.querySelector('input');
+            input.focus();
+        });
+
+        // Submit filters
+        submitBtn.addEventListener('click', function() {
+            submitFilters();
+        });
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = `toast ${type} show`;
+
+            setTimeout(() => {
+                toast.className = 'toast';
+            }, 3000);
+        }
+
+        // Submit filters function
+        function submitFilters() {
+            const inputs = document.querySelectorAll("input[name='filters']");
+            const filters = Array.from(inputs).map(input => input.value).filter(value => value.trim() !== '');
+
+            fetch("/api/filters", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(filters)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    showToast(`Successfully submitted ${filters.length} filters`, 'success');
+                })
+                .catch(error => {
+                    showToast('Error submitting filters. Please try again.', 'error');
+                    console.error('Error:', error);
+                });
+        }
+
+        // Add animation class to existing filter fields
+        const existingFields = document.querySelectorAll('.filter-field');
+        existingFields.forEach(field => {
+            field.style.animation = 'slideIn 0.3s ease-out';
+        });
+    });
+</script>
+</body>
+</html>

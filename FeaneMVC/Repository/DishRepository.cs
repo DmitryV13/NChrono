@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using FinalProject.DbModel;
+﻿using FinalProject.DbModel;
 using FinalProject.Models;
-using Microsoft.EntityFrameworkCore;
 using WebApplication1.Interfaces;
-using WebApplication1.Models;
 using WebApplication1.Models.Response;
 
-namespace WebApplication1.Repository
+namespace FeaneMVC.Repository
 {
     public class DishRepository : IDishes
     {
