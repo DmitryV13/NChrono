@@ -1,0 +1,82 @@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forgot Password</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            text-align: center;
+        }
+
+        .btn {
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            margin-top: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+            .btn:hover {
+                background-color: #0056b3;
+            }
+
+        .form-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            max-width: 300px;
+            margin-top: 20px;
+        }
+
+            .form-container h2 {
+                margin-bottom: 20px;
+                color: #333;
+            }
+
+            .form-container input[type="email"] {
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 10px;
+                border: 1px solid #ccc;
+                border-radius: 5px;
+                box-sizing: border-box;
+            }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <button id="forgot-password-btn" class="btn">Забыли пароль?</button>
+
+        <div id="forgot-password-form" class="form-container hidden">
+            <h2>Восстановление пароля</h2>
+            <p>Пожалуйста, введите свою электронную почту, чтобы получить новый пароль.</p>
+            <input type="email" id="email" placeholder="Введите вашу почту" required>
+            <button id="send-password-btn" class="btn">Отправить новый пароль</button>
+        </div>
+    </div>
+
+
+</body>
+</html>

@@ -1,0 +1,160 @@
+﻿@{
+    Layout = null;
+}
+
+<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css"
+      integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf"
+      crossorigin="anonymous">
+<link rel="stylesheet" href="~/css/Auth.css" asp-append-version="true" />
+
+<div class="container" id="container">
+    <div class="form-container sign-up-container">
+        @using (Html.BeginForm("Register", "Account", FormMethod.Post, new { @class = "register_form", id = "registerForm" }))
+        {
+            <h1>Регистрация</h1>
+            <div class="social-container">
+                <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            @if (TempData["RegisterError"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["RegisterError"]
+                </div>
+            }
+            <input type="text" placeholder="Username" name="Username" id="username" />
+            <div class="col-md-12 form-group text-center">
+                <span id="errorName" class="text-danger"></span>
+            </div>
+
+            <input type="email" placeholder="Email" name="Email" id="email" />
+            <div class="col-md-12 form-group text-center">
+                <span id="errorEmail" class="text-danger"></span>
+            </div>
+
+            <input type="password" placeholder="Password" name="Password" id="password" />
+            <div class="col-md-12 form-group text-center">
+                <span id="errorPassword" class="text-danger"></span>
+            </div>
+
+            <button type="submit">Зарегистрироваться</button>
+        }
+    </div>
+
+    <div class="form-container sign-in-container">
+        @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { @class = "login_form", id = "loginForm" }))
+        {
+            @Html.AntiForgeryToken()
+
+            <h1>Авторизация</h1>
+            <div class="social-container">
+                <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+                <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <input type="text" placeholder="Name or Email" name="Credential" id="credential" />
+            <div class="col-md-12 form-group text-center">
+                <span id="errorCredential" class="text-danger"></span>
+            </div>
+            <input type="password" placeholder="Password" name="Password" id="login_password" />
+            <a href="ForgotPassword">Забыли пароль?</a>
+            <button type="submit">Вход</button>
+        }
+    </div>
+
+    <div class="overlay-container">
+        <div class="overlay">
+            <div class="overlay-panel overlay-left">
+                <h1>Добро пожаловать!</h1>
+                <p>Чтобы оставаться на связи с нами, пожалуйста, войдите в систему с вашей личной информацией</p>
+                <button class="ghost" id="signIn">Авторизация</button>
+            </div>
+            <div class="overlay-panel overlay-right">
+                <h1>Привет, Друг!</h1>
+                <p>Введите свои личные данные и начните путешествие вместе с нами</p>
+                <button class="ghost" id="signUp">Регистрация</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="~/js/Auth.js"></script>
+
+<script>
+    document.getElementById("registerForm").addEventListener("submit", function (event) {
+        let username = document.getElementById('username').value;
+        let email = document.getElementById('email').value;
+        let password = document.getElementById('password').value;
+
+        let errorName = "";
+        let errorEmail = "";
+        let errorPassword = "";
+
+        if (username.length === 0) {
+            errorName += "Пожалуйста, заполните поле имени.<br>";
+        } else if (username.length < 4) {
+            errorName += "Некорректная длина имени (минимум 4 символа).<br>";
+        } else if (username.length > 20) {
+            errorName += "Некорректная длина имени (максимум 20 символов).<br>";
+        }
+
+        if (email.length === 0) {
+            errorEmail += "Пожалуйста, заполните поле email.<br>";
+        }
+
+        if (password.length === 0) {
+            errorPassword += "Пожалуйста, введите пароль.<br>";
+        } else if (password.length < 8) {
+            errorPassword += "Слишком короткий пароль (минимум 8 символов).<br>";
+        } else {
+            if (!/[A-Z]/.test(password)) {
+                errorPassword += "Пароль должен содержать хотя бы одну заглавную букву.<br>";
+            }
+            if (!/[0-9]/.test(password)) {
+                errorPassword += "Пароль должен содержать хотя бы одну цифру.<br>";
+            }
+        }
+
+        if (errorName !== "") {
+            document.getElementById("errorName").innerHTML = errorName;
+            event.preventDefault();
+        }
+
+        if (errorEmail !== "") {
+            document.getElementById("errorEmail").innerHTML = errorEmail;
+            event.preventDefault();
+        }
+
+        if (errorPassword !== "") {
+            document.getElementById("errorPassword").innerHTML = errorPassword;
+            event.preventDefault();
+        }
+    });
+
+    document.getElementById("loginForm").addEventListener("submit", function (event) {
+        let credential = document.getElementById('credential').value;
+        let password = document.getElementById('login_password').value;
+
+        let errorCredential = "";
+        let errorPassword = "";
+
+        if (credential.length === 0) {
+            errorCredential += "Пожалуйста, заполните поле логина.<br>";
+        }
+
+        if (password.length === 0) {
+            errorPassword += "Пожалуйста, введите пароль.<br>";
+        }
+
+        if (errorCredential !== "") {
+            document.getElementById("errorCredential").innerHTML = errorCredential;
+            event.preventDefault();
+        }
+
+        if (errorPassword !== "") {
+            document.getElementById("errorPassword").innerHTML = errorPassword;
+            event.preventDefault();
+        }
+    });
+</script>

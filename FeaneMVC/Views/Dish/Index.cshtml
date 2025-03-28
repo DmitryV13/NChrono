@@ -1,0 +1,178 @@
+﻿@model IEnumerable<Dish>
+
+@{
+    Layout = "_LayoutProfile";
+}
+
+<style>
+    .admin-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        background-color: #f7f7f7;
+        border-radius: 10px;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+    }
+
+    .admin-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+        .admin-header h2 {
+            font-size: 24px;
+            color: #333;
+        }
+
+    .add-dish-btn {
+        background-color: #28a745;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+        .add-dish-btn:hover {
+            background-color: #218838;
+        }
+
+    .table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 20px;
+    }
+
+        .table th, .table td {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        .table th {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .table tbody tr:hover {
+            background-color: #f1f1f1;
+        }
+
+    .table-actions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .edit-btn {
+        background-color: #ffc107;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .edit-btn:hover {
+            background-color: #e0a800;
+        }
+
+    .delete-btn {
+        background-color: #dc3545;
+        color: white;
+        padding: 8px 12px;
+        border-radius: 5px;
+        text-decoration: none;
+        transition: background-color 0.3s ease;
+    }
+
+        .delete-btn:hover {
+            background-color: #c82333;
+        }
+
+    .empty-message {
+        text-align: center;
+        font-size: 18px;
+        color: #999;
+        margin-top: 20px;
+    }
+</style>
+
+<div class="admin-container">
+    <div class="admin-header">
+        <h2>Dishes List</h2>
+        <a href="@Url.Action("AddDish", "Dish")" class="add-dish-btn">Add New Dish</a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="empty-message">
+            <p>No dishes available. Please add some dishes.</p>
+        </div>
+    }
+    else
+    {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Price</th>
+                    <th>Category</th>
+                    <th>Image</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var dish in Model)
+                {
+                    <tr>
+                        <td>@dish.Name</td>
+                        <td>@dish.Description</td>
+                        <td>@dish.Price.ToString("C", new System.Globalization.CultureInfo("en-US"))</td>
+
+                        <td>@dish.Category</td>
+                        <td>
+                            <img src="@dish.ImageUrl" alt="@dish.Name" style="width: 60px; height: 60px; border-radius: 8px;" />
+                        </td>
+                        <td>
+                            <div class="table-actions">
+                                <a href="@Url.Action("EditDish", new { id = dish.Id })" class="edit-btn">Edit</a>
+                                <button class="delete-btn" onclick="deleteDish('@dish.Id')">Delete</button>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
+
+
+
+<script>
+    function deleteDish(id) {
+        if (confirm("Are you sure you want to delete this dish?")) {
+            $.ajax({
+                url: '@Url.Action("DeleteDish")', // Убедитесь, что маршрут указан правильно
+                type: 'POST',
+                data: { id: id },
+                success: function (response) {
+                    if (response.status) {
+                        $('#dish-row-' + id).remove(); // Удаление строки из таблицы
+                        alert('Dish deleted successfully!');
+                    } else {
+                        alert('Failed to delete the dish. Please try again.');
+                    }
+                },
+                error: function () {
+                    alert('An error occurred. Please try again.');
+                }
+            });
+        }
+    }
+
+
+    </script>

@@ -1,0 +1,142 @@
+﻿
+@{
+    Layout = "_LayoutProfile";
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <style>
+        .container {
+            max-width: 800px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+
+        th, td {
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .form-group {
+            margin: 10px 0;
+        }
+
+            .form-group input[type="number"] {
+                width: 60px;
+            }
+
+            .form-group input[type="submit"] {
+                background-color: #007bff;
+                color: white;
+                border: none;
+                cursor: pointer;
+            }
+
+                .form-group input[type="submit"]:hover {
+                    background-color: #0056b3;
+                }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Shopping Cart</h1>
+        @if (Model?.CartItems != null && Model.CartItems.Any())
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Quantity</th>
+                        <th>Total</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.CartItems)
+                    {
+                        <tr>
+                            <td>@item.Name</td>
+                            <td>@item.Price.ToString("C")</td>
+                            <td>
+                                <form asp-action="UpdateQuantity" method="post">
+                                    <input type="hidden" name="dishId" value="@item.DishId" />
+                                    <input type="number" name="quantity" value="@item.Quantity" min="1" />
+                                    <input type="submit" value="Update" />
+                                </form>
+                            </td>
+                            <td>@item.TotalPrice.ToString("C")</td>
+                            <td>
+                                <form asp-action="Remove" method="post">
+                                    <input type="hidden" name="dishId" value="@item.DishId" />
+                                    <input type="submit" value="Remove" />
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <h3>Total: @Model.Total.ToString("C")</h3>
+           <form asp-action="Checkout" asp-controller="Payment" method="post">
+                <input type="hidden" name="amount" value="@Model.Total" />
+                <input type="submit" class="pay-button" value="Pay Now" />
+            </form>
+        }
+        else
+        {
+            <p>Your cart is empty.</p>
+        }
+
+    </div>
+</body>
+</html>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        document.querySelectorAll('.cart-icon').forEach(function (element) {
+            element.addEventListener('click', function (event) {
+                event.preventDefault();
+
+                var dishId = this.getAttribute('data-id');
+                var name = this.getAttribute('data-name');
+                var price = this.getAttribute('data-price');
+                var quantity = this.getAttribute('data-quantity');
+
+                // AJAX-запрос с передачей данных через query string
+                var url = `/Cart/Add?dishId=${dishId}&name=${encodeURIComponent(name)}&price=${price}&quantity=${quantity}`;
+
+                fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('input[name="__RequestVerificationToken"]').value // для защиты от CSRF
+                    }
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            alert('Dish added to cart!');
+                        } else {
+                            alert('Failed to add dish to cart.');
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    });
+
+</script>

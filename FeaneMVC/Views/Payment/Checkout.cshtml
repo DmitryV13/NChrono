@@ -1,0 +1,111 @@
+﻿@model WebApplication1.Models.PaymentDetails
+
+@{
+    Layout = null;
+    var selectedCurrency = "USD"; // Use USD as the currency
+    var amount = ViewBag.Amount; // Ensure you pass the amount from the controller
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-weight: bold;
+            }
+
+            .form-group input, .form-group select {
+                width: 100%;
+                padding: 8px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+            }
+
+                .form-group input[type="submit"] {
+                    background-color: #28a745;
+                    color: #fff;
+                    border: none;
+                    cursor: pointer;
+                    font-size: 16px;
+                }
+
+                    .form-group input[type="submit"]:hover {
+                        background-color: #218838;
+                    }
+
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Payment Information</h1>
+        <form asp-action="SubmitPayment" method="post">
+            <div class="form-group">
+                <label for="CardNumber">Card Number</label>
+                <input type="text" id="CardNumber" name="CardNumber" placeholder="1234 5678 9012 3456" required>
+            </div>
+            <div class="form-group">
+                <label for="CardHolderName">Card Holder Name</label>
+                <input type="text" id="CardHolderName" name="CardHolderName" placeholder="John Doe" required>
+            </div>
+            <div class="form-group">
+                <label for="ExpiryDate">Expiry Date</label>
+                <input type="text" id="ExpiryDate" name="ExpiryDate" placeholder="MM/YY" required>
+            </div>
+            <div class="form-group">
+                <label for="CVV">CVV</label>
+                <input type="text" id="CVV" name="CVV" placeholder="123" required>
+            </div>
+
+            <h1>Sum of pay:@Model.TotalPrice</h1>
+
+            <input type="hidden" name="Currency" value="@selectedCurrency" />
+
+            <div class="form-group">
+                <input type="submit" value="Pay Now">
+            </div>
+        </form>
+        @if (ViewBag.ErrorMessage != null)
+        {
+            <div class="error-message">
+                @ViewBag.ErrorMessage
+            </div>
+        }
+    </div>
+
+</body>
+</html>

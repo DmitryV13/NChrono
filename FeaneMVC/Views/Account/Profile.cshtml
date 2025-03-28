@@ -1,0 +1,184 @@
+﻿@model IEnumerable<Reservation>
+
+@{
+    Layout = "_LayoutProfile";
+}
+
+<style>
+    body.adaptive {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        color: #333;
+        margin: 0;
+        padding: 0;
+    }
+
+    .page_layout-clear {
+        padding: 20px;
+    }
+
+    .layout {
+        display: flex;
+        justify-content: center;
+    }
+
+    .layout__content {
+        width: 100%;
+        max-width: 1200px;
+        background-color: #fff;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        overflow: hidden;
+    }
+
+    .checkout-v2-wrapper {
+        display: flex;
+        flex-wrap: wrap;
+        padding: 20px;
+    }
+
+    .co-sidebar--menu {
+        flex: 1;
+        max-width: 300px;
+        margin-right: 20px;
+    }
+
+    .co-menu {
+        background-color: #f9f9f9;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .co-menu-item {
+        margin-bottom: 15px;
+    }
+
+    .co-menu-link {
+        display: block;
+        padding: 10px 15px;
+        color: #333;
+        text-decoration: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+        .co-menu-link:hover {
+            background-color: #ececec;
+        }
+
+    .co-menu-link--active {
+        background-color: #007bff;
+        color: #fff;
+    }
+
+    .co-section--content {
+        flex: 2;
+        padding: 20px;
+        background-color: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .co-checkout-title {
+        font-size: 24px;
+        margin-bottom: 20px;
+        color: #333;
+    }
+
+    .co-checkout-block--padded {
+        padding: 20px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+    }
+
+        .co-checkout-block--padded p {
+            margin: 0;
+            color: #666;
+        }
+</style>
+
+
+
+
+
+<body class="adaptive" data-multi-lang="false">
+    <div class="page_layout page_layout-clear">
+        <main>
+            <div class="layout">
+                <div class="layout__content">
+                    <div class="checkout-v2-wrapper co-section--content_wrapper">
+                        <div class="co-sidebar--menu">
+                            <input class="co-menu-switcher" id="co-menu-toggle" type="checkbox" />
+                            <label class="co-menu-toggle" data-title="Личный кабинет" for="co-menu-toggle"></label>
+                            <div class="co-menu co-menu--personal co-checkout-block--padded">
+                                <div class="co-menu-item co-menu-item--personal">
+                                    <a class="co-menu-link co-menu-link--personal co-link co-menu-link--active" href="/account/profile">
+                                        История резерваций
+                                    </a>
+                                </div>
+                                <div class="co-menu-item co-menu-item--personal">
+                                    <a class="co-menu-link co-menu-link--personal co-link" href="/account/addresses">
+                                        Адрес доставки
+                                    </a>
+                                </div>
+                                <div class="co-menu-item co-menu-item--personal">
+                                    <a class="co-menu-link co-menu-link--personal co-link" href="/account/contacts">
+                                        Контактные данные
+                                    </a>
+                                </div>
+                                <div class="co-menu-item co-menu-item--personal">
+                                    <a class="co-menu-link co-menu-link--personal co-link" href="/account/logout">
+                                        Выход
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="co-section--content">
+                            <div class="co-section--checkout_header co-checkout-block--padded">
+                                <h1 class="co-checkout-title co-title co-title--h1">
+                                    История резерваций
+                                </h1>
+                            </div>
+
+                            @if (Model.Any())
+                            {
+                                <table class="table table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>Дата резервации</th>
+                                            <th>Имя клиента</th>
+                                            <th>Количество человек</th>
+                                            <th>Статус</th>
+                                            <th>Сумма</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var reservation in Model)
+                                        {
+                                            <tr>
+                                                <td>@reservation.ReservationDate.ToString("d MMMM yyyy")</td>
+                                                <td>@reservation.CustomerName</td>
+                                                <td>@reservation.NumberOfPeople</td>
+                                                <td>@reservation.Status</td>
+                                                <td>@reservation.Amount.ToString("C")</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            }
+                            else
+                            {
+                                <p>Вы не сделали ещё ни одной резервации.</p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <link href="https://static.insales-cdn.com/assets/1/2900/1583956/1719923585/theme.css" rel="stylesheet" type="text/css" onload="document.body.classList.add('settings_loaded');" />
+    <script src="https://static.insales-cdn.com/assets/1/2900/1583956/1719923585/theme.js" charset="utf-8"></script>
+</body>

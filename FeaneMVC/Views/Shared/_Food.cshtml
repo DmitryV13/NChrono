@@ -1,0 +1,143 @@
+﻿@model WebApplication1.Models.CartAndDishes
+
+<section class="food_section layout_padding-bottom">
+    <div class="container">
+        <div class="heading_container heading_center">
+            <h2>Our Menu</h2>
+        </div>
+
+        <!-- Filters -->
+        <ul class="filters_menu">
+            <li class="active" data-filter="*">All</li>
+            <li data-filter=".burger">Burger</li>
+            <li data-filter=".pizza">Pizza</li>
+            <li data-filter=".pasta">Pasta</li>
+            <li data-filter=".fries">Fries</li>
+        </ul>
+
+        <!-- Content -->
+        <div class="filters-content">
+            @if (ViewBag.Message != null)
+            {
+                <p>@ViewBag.Message</p>
+            }
+            else
+            {
+                <div class="row grid">
+                    @foreach (var dish in Model.dish)
+                    {
+                        <div class="col-sm-6 col-lg-4 all @dish.Category.ToLower()" data-name="@dish.Name" data-price="@dish.Price">
+                            <div class="box">
+                                <div>
+                                    <div class="img-box">
+                                        <img src="@(!string.IsNullOrWhiteSpace(dish.ImageUrl) ? Url.Content(dish.ImageUrl) : "~/images/default.png")" alt="@dish.Name">
+                                    </div>
+                                    <div class="detail-box">
+                                        <h5 class="name">@dish.Name</h5>
+                                        <p>@dish.Description</p>
+                                        <div class="options">
+                                            <h6 class="price">$@(dish.Price > 0 ? dish.Price.ToString("0.00") : "N/A")</h6>
+                                            <a href="#" class="cart-icon add-to-cart" data-id="@dish.Id" data-name="@dish.Name" data-price="@dish.Price" data-quantity="1">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-cart">
+                                                    <circle cx="9" cy="21" r="1"></circle>
+                                                    <circle cx="20" cy="21" r="1"></circle>
+                                                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"></path>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<!-- Add your CSS for filtering here -->
+<style>
+    .add-to-cart {
+        display: inline-block;
+        background-color: yellow;
+        padding: 10px;
+        border-radius: 50%;
+        border: 2px solid #f1c40f;
+        color: #f39c12;
+        font-size: 20px;
+        text-decoration: none;
+    }
+
+        .add-to-cart:hover {
+            background-color: #f39c12;
+            color: white;
+        }
+
+    .filters_menu li {
+        cursor: pointer;
+    }
+
+        .filters_menu li.active {
+            font-weight: bold;
+        }
+
+    .box {
+        border: 1px solid #ddd;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+</style>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        // Filter functionality
+        $('.filters_menu li').on('click', function () {
+            var filterValue = $(this).attr('data-filter');
+
+            // Remove active class from all menu items
+            $('.filters_menu li').removeClass('active');
+            // Add active class to the clicked item
+            $(this).addClass('active');
+
+            // Filter items
+            if (filterValue === '*') {
+                $('.grid .all').show();
+            } else {
+                $('.grid .all').hide();
+                $(filterValue).show();
+            }
+        });
+
+        // Add to cart functionality
+        $('.add-to-cart').on('click', function (e) {
+            e.preventDefault();
+
+            // Get data from element attributes
+            var dishId = $(this).data('id');
+            var dishName = $(this).data('name');
+            var dishPrice = $(this).data('price');
+            var quantity = $(this).data('quantity');
+
+            // Send data via AJAX
+            $.ajax({
+                url: "@Url.Action("Add", "Cart")",
+                type: 'POST',
+                contentType: 'application/x-www-form-urlencoded',
+                data: {
+                    DishId: dishId,
+                    DishName: dishName,
+                    DishPrice: dishPrice,
+                    Quantity: quantity
+                },
+                success: function (response) {
+                    alert('Dish added to cart successfully!');
+                },
+                error: function (xhr, status, error) {
+                    alert('An error occurred: ' + error);
+                }
+            });
+        });
+    });
+</script>

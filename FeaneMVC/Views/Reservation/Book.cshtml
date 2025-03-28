@@ -1,0 +1,101 @@
+﻿@model FinalProject.Models.Reservation
+<!DOCTYPE html>
+<html>
+
+@{
+    Layout = "_LayoutBook";
+}
+
+<head>
+    <style>
+        /* Always set the map height explicitly to define the size of the div
+               * element that contains the map. */
+        #map {
+            height: 100%;
+        }
+        /* Optional: Makes the sample page fill the window. */
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body class="sub_page">
+
+    <!-- book section -->
+    <section class="book_section layout_padding">
+        <div class="container">
+            <div class="heading_container">
+                <h2>
+                    Book A Table
+                </h2>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="form_container">
+                        <form asp-action="ReservationProcess" method="post">
+                            <div>
+                                <input type="text" class="form-control" asp-for="CustomerName" placeholder="Your Name" />
+                                <span asp-validation-for="CustomerName" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <input type="text" class="form-control" asp-for="PhoneNumber" placeholder="Phone Number" />
+                                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <input type="email" class="form-control" asp-for="UserEmail" placeholder="Your Email" />
+                                <span asp-validation-for="UserEmail" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <select class="form-control nice-select wide" asp-for="NumberOfPeople">
+                                    <option value="" disabled selected>
+                                        How many persons?
+                                    </option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                    <option value="4">4</option>
+                                    <option value="5">5</option>
+                                </select>
+                                <span asp-validation-for="NumberOfPeople" class="text-danger"></span>
+                            </div>
+                            <div>
+                                <input type="date" class="form-control" asp-for="ReservationDate" />
+                                <span asp-validation-for="ReservationDate" class="text-danger"></span>
+                            </div>
+                            <div class="btn_box">
+                                <button type="submit">
+                                    Book Now
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="map_container">
+                        <div id="map"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!-- end book section -->
+    <!-- footer section -->
+    <!-- Google Map API -->
+    <script>
+        var map;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+         center: {lat: 47.0105, lng: 28.8638},
+                zoom: 12
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/gh/somanchiu/Keyless-Google-Maps-API@v6.7/mapsJavaScriptAPI.js" async defer></script>
+
+    <!-- Your custom scripts -->
+    <script src="~/js/custom.js"></script>
+</body>
+
+</html>
