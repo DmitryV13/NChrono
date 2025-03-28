@@ -26,13 +26,10 @@ namespace WebApplication1.Repository
             _dbContext = dbContext;
         }
 
-        // Sets a user cookie and updates or creates a session
         public void SetUserCookie(string loginCredential, bool rememberMe)
         {
-            // Генерация значения куки
             var cookieValue = CookieGenerator.Create(loginCredential);
 
-            // Установка куки
             var cookieOptions = new CookieOptions
             {
                 Expires = rememberMe ? DateTime.Now.AddDays(30) : DateTime.Now.AddMinutes(60),
@@ -43,7 +40,6 @@ namespace WebApplication1.Repository
 
             _httpContextAccessor.HttpContext.Response.Cookies.Append("X-KEY", cookieValue, cookieOptions);
 
-            // Работа с базой данных
             var validate = new EmailAddressAttribute();
             Session currentSession;
 
@@ -58,7 +54,7 @@ namespace WebApplication1.Repository
 
             if (currentSession != null)
             {
-                // Обновление существующей сессии
+                
                 currentSession.CookieString = cookieValue;
                 currentSession.ExpireTime = cookieOptions.Expires.Value;
 
@@ -66,7 +62,7 @@ namespace WebApplication1.Repository
             }
             else
             {
-                // Создание новой сессии
+                
                 var newSession = new Session
                 {
                     Username = loginCredential,
@@ -82,7 +78,7 @@ namespace WebApplication1.Repository
 
     
 
-    // Retrieves user data based on the cookie value asynchronously
+    
     public UserData GetUserByCookie(string cookieValue)
         {
             var decryptedValue = CookieGenerator.Validate(cookieValue);
@@ -91,7 +87,7 @@ namespace WebApplication1.Repository
 
             if (session != null)
             {
-                // Retrieve user by session.Username
+                
                 return  _dbContext.Users
                     .FirstOrDefault(u => u.Username == session.Username);
             }
@@ -99,17 +95,15 @@ namespace WebApplication1.Repository
             return null;
         }
 
-        // Logs out the user by deleting the cookie and clearing the session
+        
         public void UserLogout()
         {
             var httpContext = _httpContextAccessor.HttpContext;
 
             if (httpContext != null)
             {
-                // Delete user cookie
                 httpContext.Response.Cookies.Delete("X-KEY");
 
-                // Clear session data
                 httpContext.Session.Clear();
             }
         }
@@ -119,7 +113,7 @@ namespace WebApplication1.Repository
 
             if (string.IsNullOrEmpty(cookieValue))
             {
-                // Логируем отсутствие cookie
+                
                 return Guid.Empty;
             }
 
@@ -129,7 +123,7 @@ namespace WebApplication1.Repository
 
                 if (user == null)
                 {
-                    // Логируем случай, когда пользователь не найден
+                   
                     return Guid.Empty;
                 }
 
@@ -165,7 +159,7 @@ namespace WebApplication1.Repository
                 }
             }
             SetSession("UserId", userId.ToString());
-            return userId; // Замените на нужный результат
+            return userId; 
         }
 
         public async Task SessionStatus()
@@ -177,13 +171,13 @@ namespace WebApplication1.Repository
                     var profile = GetUserByCookie(apiCookie);
                     if (profile != null)
                     {
-                        // Устанавливаем объекты сессии
+                        
                         _httpContextAccessor.HttpContext.Session.SetString("LoginStatus", "login");
                         _httpContextAccessor.HttpContext.Session.SetString("Permission", profile.Roles.ToString());
                     }
                     else
                     {
-                        // Очищаем сессию и удаляем cookie
+                        
                         _httpContextAccessor.HttpContext.Session.Clear();
 
                         if (_httpContextAccessor.HttpContext.Request.Cookies.ContainsKey("X-KEY"))
@@ -215,7 +209,6 @@ namespace WebApplication1.Repository
                 throw new ArgumentException("Session name cannot be null or empty.", nameof(name));
             }
 
-            // Проверка, что значение не null
             if (v == null)
             {
                 throw new ArgumentNullException(nameof(v), "Session value cannot be null.");

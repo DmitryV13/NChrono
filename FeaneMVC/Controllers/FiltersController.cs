@@ -47,4 +47,45 @@ public class FiltersController : Controller
     {
         return View();
     }
+    [HttpGet("filter-page")]
+    public IActionResult FilterPage()
+    {
+        var userId = _sessionService.GetUserId();
+
+        var userFilters = _context.UserFilters
+            .Where(f => f.UserId == userId)
+            .Select(f => f.Filter)
+            .Distinct()
+            .ToList();
+        
+        
+        UserFilterNotificationList filters = new UserFilterNotificationList();
+        filters.Filter = userFilters;
+        filters.Id = userId;
+        foreach (var filter in userFilters)
+        {
+            filters.maDictionary.Add(filter, new List<string>(){"sdfsdfdsf","sdfdsfsdfsdf","sdfsdfsdf"});
+        }
+        ViewData["Title"] = "Filters";
+        return View(filters);
+    }
+    
+    [HttpGet("all")]
+    public IActionResult GetUserFilters()
+    {
+        var userId = _sessionService.GetUserId();
+
+        var userFilters = _context.UserFilters
+            .Where(f => f.UserId == userId)
+            .Select(f => f.Filter)
+            .ToList();
+        
+        
+        Dictionary<string, List<string>> filters = new Dictionary<string, List<string>>();
+        foreach (var filter in userFilters)
+        {
+            filters.Add(filter, new List<string>(){"sdfsdfdsf","sdfdsfsdfsdf","sdfsdfsdf"});
+        }
+        return Ok(filters);
+    }
 }
