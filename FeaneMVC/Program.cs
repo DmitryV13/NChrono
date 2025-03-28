@@ -25,6 +25,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true; // ����������� ������ ������ ����� HTTP
     options.Cookie.IsEssential = true; // �������������� cookie
 });
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<AdminOrModeratorModeAttribute>();
 builder.Services.AddScoped<AdminModeAttribute>();
 builder.Services.AddScoped<AdminOrVipModeAttribute>();
