@@ -4,7 +4,7 @@ using WebApplication1.Models;
 
 namespace FeaneMVC.Models;
 
-public class UserFilter
+public sealed class UserFilter
 {
     [Key]
     public Guid Id { get; set; }
@@ -16,5 +16,5 @@ public class UserFilter
     public Guid UserId { get; set; }
 
     [ForeignKey("UserId")]
-    public virtual UserData User { get; set; }
+    public UserData User { get; set; }
 }
