@@ -115,12 +115,37 @@ public class MailController : Controller
 
     public IActionResult Index()
     {
+
         var userId = _sessionService.GetUserId();
-        var mails = _context.MailMessages
-            .Where(m => m.UserId == userId)
+        var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+
+        if (user == null)
+        {
+            return Unauthorized("User not found.");
+        }
+
+        // Получаем фильтры пользователя
+        var userFilters = _context.UserFilters
+            .Where(f => f.UserId == userId)
+            .Select(f => f.Filter)
+            .Distinct()
             .ToList();
 
-        return View(mails);
+        // Получаем все письма пользователя
+        var mails = _context.MailMessages
+            .Where(m => m.UserId == userId)
+            .OrderByDescending(m => m.Date)
+            .ToList();
+
+        // Создаем модель представления
+        var viewModel = new EmailFilterViewModel
+        {
+            Filters = userFilters,
+            Emails = mails,
+            UserId = userId
+        };
+
+        return View(viewModel); 
     }
     
 }

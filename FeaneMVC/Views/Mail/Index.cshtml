@@ -1,13 +1,20 @@
-@model List<FeaneMVC.Models.MailMessage>
+@model FeaneMVC.Models.EmailFilterViewModel
+
+
 
 @{
     ViewData["Title"] = "Mail Dashboard";
     Layout = null;
     // Group emails by filter
-    var emailsByFilter = Model.GroupBy(m => m.Filter).ToDictionary(g => g.Key, g => g.ToList());
+        var emailsByFilter = Model.Emails != null 
+        ? Model.Emails
+            .GroupBy(e => e.Filter)
+            .ToDictionary(g => g.Key, g => g.ToList())
+    : new Dictionary<string, List<FeaneMVC.Models.MailMessage>>();
 
+    var filters = Model.Filters ?? new List<string>();
     // Get all unique filters
-    var filters = emailsByFilter.Keys.ToList();
+ //   var filters = emailsByFilter.Keys.ToList();
 }
 
 <!DOCTYPE html>
@@ -620,6 +627,7 @@
     </style>
 </head>
 <body>
+
 <div class="app-container">
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -633,24 +641,24 @@
         </div>
         <ul class="filter-list" id="filter-list">
             <li class="filter-item active" data-filter="all">
+                <span class="filter-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="3" rx="2" />
+                        <path d="M7 7h10M7 12h10M7 17h10" />
+                    </svg>
+                </span>
+                <span class="filter-name">All Emails</span>
+                <span class="filter-count">@Model.Emails.Count</span>
+            </li>
+           @foreach (var filter in filters)
+            {
+                var count = emailsByFilter.ContainsKey(filter) ? emailsByFilter[filter].Count : 0;
+                <li class="filter-item" data-filter="@filter">
                     <span class="filter-icon">
                         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <rect width="18" height="18" x="3" y="3" rx="2" />
-                            <path d="M7 7h10M7 12h10M7 17h10" />
+                            <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
                         </svg>
                     </span>
-                <span class="filter-name">All Emails</span>
-                <span class="filter-count">@Model.Count</span>
-            </li>
-            @foreach (var filter in filters)
-            {
-                var count = emailsByFilter[filter].Count;
-                <li class="filter-item" data-filter="@filter">
-                        <span class="filter-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                        </span>
                     <span class="filter-name">@filter</span>
                     <span class="filter-count">@count</span>
                 </li>
@@ -686,45 +694,54 @@
             </div>
         </header>
         <div class="email-list" id="email-list">
-            <div class="empty-state" id="empty-state" style="display: none;">
-                <div class="empty-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="20" height="16" x="2" y="4" rx="2"/>
-                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
-                    </svg>
-                </div>
-                <h3 class="empty-title">No emails found</h3>
-                <p class="empty-description">There are no emails in this filter yet. Sync your emails to fetch new messages.</p>
-                <button class="btn btn-primary" id="empty-sync-btn">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
-                    </svg>
-                    Sync Emails
-                </button>
-            </div>
-
-            @foreach (var email in Model)
-            {
-                <div class="email-item" data-filter="@email.Filter" data-id="@email.Id">
-                    <div class="email-header">
-                        <span class="email-sender">@email.Email</span>
-                        <span class="email-date">@email.Date.ToString("MMM d, yyyy")</span>
+                @if (Model.Emails == null || !Model.Emails.Any())
+                {
+                    <div class="empty-state" id="empty-state">
+                        <div class="empty-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
+                                <rect width="20" height="16" x="2" y="4" rx="2"/>
+                                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>
+                            </svg>
+                        </div>
+                        <h3 class="empty-title">No emails found</h3>
+                        <p class="empty-description">There are no emails in this filter yet. Sync your emails to fetch new messages.</p>
+                        <button class="btn btn-primary" id="empty-sync-btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+                            </svg>
+                            Sync Emails
+                        </button>
                     </div>
-                    <h3 class="email-subject">@email.Subject</h3>
-                    <div class="email-preview">@(string.IsNullOrEmpty(email.Body) ? "No content" : email.Body.Length > 300 ? email.Body.Substring(0, 300) + "..." : email.Body)</div>
-                    <div class="email-footer">
-                        <span class="email-filter-tag">@email.Filter</span>
-                        <div class="email-actions">
-                            <button class="btn btn-sm btn-outline view-email-btn" data-id="@email.Id">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                                View
-                            </button>
+                }
+            else
+            {
+                @foreach (var email in Model.Emails)
+                {
+                    <div class="email-item" data-filter="@email.Filter" data-id="@email.Id">
+                        <div class="email-header">
+                            <span class="email-sender">@email.Email</span>
+                            <span class="email-date">@email.Date.ToString("MMM d, yyyy")</span>
+                        </div>
+                        <h3 class="email-subject">@email.Subject</h3>
+                        <div class="email-preview">
+                            @(string.IsNullOrEmpty(email.Body) ? "No content" : 
+                              email.Body.Length > 300 ? email.Body.Substring(0, 300) + "..." : 
+                              email.Body)
+                        </div>
+                        <div class="email-footer">
+                            <span class="email-filter-tag">@email.Filter</span>
+                            <div class="email-actions">
+                                <button class="btn btn-sm btn-outline view-email-btn" data-id="@email.Id">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                    View
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                }
             }
         </div>
     </main>
