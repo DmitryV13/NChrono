@@ -58,8 +58,8 @@ namespace FeaneMVC.Controllers
                 .Distinct()
                 .ToList();
 
-            string email = "rentshopvehicle.webapplication@mail.ru";
-            string password = "BKRZTN085g5qRbxAmhhT";
+            string email = "vistovskii2002@mail.ru";
+            string password = "qg6fcfBMn0eWNbyg6Vyr";
             string imapServer = "imap.mail.ru";
             int imapPort = 993;
 
@@ -174,71 +174,79 @@ namespace FeaneMVC.Controllers
         /// <param name="messageText">Текст сообщения для анализа</param>
         /// <returns>Наиболее подходящий фильтр или null в случае ошибки</returns>
         private async Task<string> GetBestMatchingFilter(List<string> filters, string messageText)
+{
+    if (filters == null || !filters.Any() || string.IsNullOrWhiteSpace(messageText))
+    {
+        return null;
+    }
+
+    var client = _httpClientFactory.CreateClient();
+    client.BaseAddress = new Uri(_chatBaseUrl);
+    client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _chatApiKey);
+
+    var prompt = $"У меня есть список фильтров: {string.Join(", ", filters)}. " +
+                $"Проанализируй следующий текст сообщения и выбери один фильтр из списка, " +
+                $"который лучше всего ему соответствует. Верни результат в виде JSON-массива с одним элементом, " +
+                $"содержащим только название фильтра без пояснений. " +
+                $"Текст сообщения: '{messageText}'";
+
+    var payload = new
+    {
+        model = "gpt-3.5-turbo",
+        messages = new[]
         {
-            if (filters == null || !filters.Any() || string.IsNullOrWhiteSpace(messageText))
-            {
-                return null;
-            }
-
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(_chatBaseUrl); // Устанавливаем базовый адрес
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _chatApiKey);
-
-            var prompt = $"У меня есть список фильтров: {string.Join(", ", filters)}. " +
-                        $"Проанализируй следующий текст сообщения и выбери один фильтр из списка, " +
-                        $"который лучше всего ему соответствует. Верни результат в виде JSON-массива с одним элементом, " +
-                        $"содержащим только название фильтра без пояснений. " +
-                        $"Текст сообщения: '{messageText}'";
-
-            var payload = new
-            {
-                model = "gpt-3.5-turbo",
-                messages = new[]
-                {
             new { role = "system", content = "Твоя задача — выбрать один наиболее подходящий фильтр из предоставленного списка для данного текста. Верни результат в виде JSON-массива с одним элементом, содержащим только название фильтра." },
             new { role = "user", content = prompt }
         },
-                max_tokens = 50
-            };
+        max_tokens = 50
+    };
 
-            var jsonPayload = JsonSerializer.Serialize(payload);
-            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
+    var jsonPayload = JsonSerializer.Serialize(payload);
+    var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-            try
+    try
+    {
+        var response = await client.PostAsync("chat/completions", content);
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"API request failed with status: {response.StatusCode}");
+            return null;
+        }
+
+        var jsonResponse = await response.Content.ReadAsStringAsync();
+        var result = JsonSerializer.Deserialize<ChatResponse>(jsonResponse);
+        var filterJson = result.choices[0].message.content.Trim();
+
+        // Проверка на наличие вложенных кавычек и удаление их
+        if (filterJson.StartsWith("\"") && filterJson.EndsWith("\""))
+        {
+            filterJson = filterJson.Substring(1, filterJson.Length - 2);
+        }
+
+        // Если строка в формате JSON массива, десериализуем как массив
+        try
+        {
+            var filterResult = JsonSerializer.Deserialize<List<string>>(filterJson);
+            if (filterResult == null || filterResult.Count == 0)
             {
-                // Используем относительный путь, так как BaseAddress установлен
-                var response = await client.PostAsync("chat/completions", content);
-                if (!response.IsSuccessStatusCode)
-                {
-                    Console.WriteLine($"API request failed with status: {response.StatusCode}");
-                    return null;
-                }
-
-                var jsonResponse = await response.Content.ReadAsStringAsync();
-                var result = JsonSerializer.Deserialize<ChatResponse>(jsonResponse);
-                var filterJson = result.choices[0].message.content.Trim();
-
-                if (!filterJson.StartsWith("[") || !filterJson.EndsWith("]"))
-                {
-                    Console.WriteLine("Invalid JSON array format: " + filterJson);
-                    return null;
-                }
-
-                var filterResult = JsonSerializer.Deserialize<List<string>>(filterJson);
-                if (filterResult == null || filterResult.Count == 0)
-                {
-                    return null;
-                }
-
-                var selectedFilter = filterResult[0];
-                return filters.Contains(selectedFilter) ? selectedFilter : null;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error in GetBestMatchingFilter: {ex.Message}");
                 return null;
             }
+
+            var selectedFilter = filterResult[0];
+            return filters.Contains(selectedFilter) ? selectedFilter : null;
         }
+        catch (JsonException ex)
+        {
+            Console.WriteLine($"Error deserializing JSON array: {ex.Message}");
+            return null;
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error in GetBestMatchingFilter: {ex.Message}");
+        return null;
+    }
+}
 
         // Вспомогательный класс для десериализации ответа API
         private class ChatResponse
