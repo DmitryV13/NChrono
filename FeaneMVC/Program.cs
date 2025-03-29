@@ -1,3 +1,5 @@
+using FeaneMVC.Repositories.Interfaces;
+using FeaneMVC.Repositories;
 using FeaneMVC.Repository;
 using FinalProject.DbModel;
 using FinalProject.Models;
@@ -25,6 +27,7 @@ builder.Services.AddSession(options =>
     options.Cookie.HttpOnly = true; // ����������� ������ ������ ����� HTTP
     options.Cookie.IsEssential = true; // �������������� cookie
 });
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<AdminOrModeratorModeAttribute>();
 builder.Services.AddScoped<AdminModeAttribute>();
 builder.Services.AddScoped<AdminOrVipModeAttribute>();
@@ -34,15 +37,16 @@ builder.Services.AddTransient<CartFactory>(provider =>
     new VipFactoryCart(provider.GetRequiredService<ApplicationDbContext>()));
 builder.Services.AddTransient<CartFactory>(provider =>
     new RegularUserCart(provider.GetRequiredService<ApplicationDbContext>()));
+builder.Services.AddScoped<IFilterRepository, FilterRepository>();
 builder.Services.AddScoped<IReservation, ReservationRepository>();
 builder.Services.AddScoped<IPaymentGateway, PaymentProcessor>();
 builder.Services.AddScoped<IUSer, UserRepository>();
 builder.Services.AddScoped<ICartService, RegularUserCartService>();
 builder.Services.AddScoped<ICartService, VIPUserCartService>();
-builder.Services.AddScoped<IDishes, DishRepository>();
 builder.Services.AddSingleton<INotification>(sp => NotificationService.Instance);
 builder.Services.AddScoped<WebApplication1.Interfaces.ISession, SessionRepository>();
-
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+Console.WriteLine("Connection String: " + connectionString);
 var app = builder.Build();
 
 // ��������� ��������� ��������� HTTP-��������

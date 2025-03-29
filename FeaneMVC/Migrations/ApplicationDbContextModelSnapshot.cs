@@ -22,6 +22,72 @@ namespace FeaneMVC.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FeaneMVC.Models.MailCheck", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Code")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("MailChecks");
+                });
+
+            modelBuilder.Entity("FeaneMVC.Models.MailMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Body")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("Date")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Filter")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("UniqueId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UniqueId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("MailMessages");
+                });
+
             modelBuilder.Entity("FeaneMVC.Models.UserFilter", b =>
                 {
                     b.Property<Guid>("Id")
@@ -396,6 +462,17 @@ namespace FeaneMVC.Migrations
                     b.ToTable("Users");
                 });
 
+            modelBuilder.Entity("FeaneMVC.Models.MailCheck", b =>
+                {
+                    b.HasOne("WebApplication1.Models.UserData", "User")
+                        .WithMany("MailChecks")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("FeaneMVC.Models.UserFilter", b =>
                 {
                     b.HasOne("WebApplication1.Models.UserData", "User")
@@ -497,6 +574,8 @@ namespace FeaneMVC.Migrations
                         .IsRequired();
 
                     b.Navigation("Filters");
+
+                    b.Navigation("MailChecks");
                 });
 #pragma warning restore 612, 618
         }

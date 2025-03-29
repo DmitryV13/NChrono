@@ -16,7 +16,6 @@ namespace SummerWork.WebApi.Controllers
     public class AccountController :Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly IDishes _dishes;
         private readonly WebApplication1.Interfaces.ISession _sessionService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICartService _cartService;
@@ -25,10 +24,9 @@ namespace SummerWork.WebApi.Controllers
         private readonly ApplicationDbContext _dbContext;
 
         // Constructor to initialize dependencies
-        public AccountController(IDishes dishes, IReservation reservation, WebApplication1.Interfaces.ISession sessionService, IHttpContextAccessor httpContextAccessor, ICartService cartService, IUSer user, ApplicationDbContext dbContext)        
+        public AccountController(IReservation reservation, WebApplication1.Interfaces.ISession sessionService, IHttpContextAccessor httpContextAccessor, ICartService cartService, IUSer user, ApplicationDbContext dbContext)        
         {
             _reservation = reservation;
-            _dishes = dishes;
             _dbContext = dbContext;
             _sessionService = sessionService;
             _httpContextAccessor = httpContextAccessor;

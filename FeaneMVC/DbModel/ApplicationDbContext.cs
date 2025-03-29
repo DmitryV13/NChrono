@@ -12,7 +12,7 @@ namespace FinalProject.DbModel
         {
         }
 
-        public DbSet<Dish> Dishes { get; set; }
+
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<UserData> Users { get; set; }
         public DbSet<ReservationHistory> ReservationsHistory { get; set; }
@@ -22,7 +22,8 @@ namespace FinalProject.DbModel
         public DbSet<Cart> Cart { get; set; }
         public DbSet<PaymentRecord> PaymentRecords { get; set; }
         public DbSet<UserFilter> UserFilters { get; set; }
-
+        public DbSet<MailCheck>  MailChecks { get; set; }
+        public DbSet<MailMessage> MailMessages { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -108,6 +109,23 @@ namespace FinalProject.DbModel
                 .WithMany(u => u.Filters)
                 .HasForeignKey(uf => uf.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            modelBuilder.Entity<MailCheck>()
+                .HasKey(m => m.Id);
+
+            modelBuilder.Entity<MailCheck>()
+                .Property(m => m.Email)
+                .IsRequired();
+
+            modelBuilder.Entity<MailCheck>()
+                .HasOne(m => m.User)            
+                .WithMany(u => u.MailChecks)    
+                .HasForeignKey(m => m.UserId)   
+                .OnDelete(DeleteBehavior.Restrict);
+            modelBuilder.Entity<MailMessage>()
+                .HasIndex(m => new { m.UniqueId, m.UserId })
+                .IsUnique();
+            
         }
 
 

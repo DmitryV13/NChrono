@@ -1,0 +1,260 @@
+﻿@model FeaneMVC.Models.weather.WeatherData
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Погода";
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #74ebd5, #acb6e5);
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .weather-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .weather-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+            .weather-section:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            }
+
+            .weather-section h3 {
+                color: #2980b9;
+                font-size: 1.4em;
+                margin-bottom: 15px;
+                border-bottom: 2px solid #3498db;
+                padding-bottom: 5px;
+            }
+
+            .weather-section p {
+                margin: 10px 0;
+                font-size: 1.1em;
+                line-height: 1.5;
+            }
+
+                .weather-section p strong {
+                    color: #2c3e50;
+                    font-weight: 600;
+                }
+
+        .weather-icon img {
+            width: 80px;
+            height: 80px;
+            margin-top: 10px;
+            transition: transform 0.3s ease;
+        }
+
+            .weather-icon img:hover {
+                transform: scale(1.1);
+            }
+
+        .form-container {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .form-group {
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+            .form-group label {
+                font-size: 1.2em;
+                color: #2c3e50;
+                margin-right: 10px;
+            }
+
+            .form-group input {
+                padding: 10px;
+                font-size: 1.1em;
+                border: 2px solid #3498db;
+                border-radius: 25px;
+                width: 250px;
+                outline: none;
+                transition: border-color 0.3s ease;
+            }
+
+                .form-group input:focus {
+                    border-color: #2980b9;
+                }
+
+        .btn {
+            padding: 12px 30px;
+            font-size: 1.2em;
+            color: #fff;
+            background: #3498db;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+
+            .btn:hover {
+                background: #2980b9;
+                transform: translateY(-3px);
+            }
+
+        .error {
+            color: #e74c3c;
+            font-size: 1.2em;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .warning {
+            color: #f39c12;
+            font-size: 1.2em;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+
+
+        {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        }
+
+
+        {
+            grid-template-columns: 1fr;
+        }
+
+        .form-group input {
+            width: 100%;
+        }
+
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Погода в @(Model?.Name ?? "Неизвестный город")</h1>
+
+        @if (ViewBag.Error != null)
+        {
+            <p class="error">@ViewBag.Error</p>
+        }
+        else if (Model?.Main == null || Model?.Weather == null || !Model.Weather.Any())
+        {
+            <p class="warning">Данные о погоде недоступны.</p>
+        }
+        else
+        {
+            <div class="weather-info">
+                <div class="weather-section">
+                    <h3>Основные данные</h3>
+                    <p><strong>Температура:</strong> @Model.Main.Temp °C</p>
+                    <p><strong>Ощущается как:</strong> @Model.Main.FeelsLike °C</p>
+                    <p><strong>Мин. температура:</strong> @Model.Main.TempMin °C</p>
+                    <p><strong>Макс. температура:</strong> @Model.Main.TempMax °C</p>
+                    <p><strong>Давление:</strong> @Model.Main.Pressure hPa</p>
+                    <p><strong>Влажность:</strong> @Model.Main.Humidity %</p>
+                </div>
+
+                <div class="weather-section">
+                    <h3>Погода</h3>
+                    @foreach (var weather in Model.Weather)
+                    {
+                        <p><strong>Состояние:</strong> @weather.Main</p>
+                        <p><strong>Описание:</strong> @weather.Description</p>
+                        <div class="weather-icon">
+                            <img src="http://openweathermap.org/img/wn/@(weather.Icon + "@2x.png")" alt="@weather.Description" />
+                        </div>
+                    }
+                </div>
+
+                <div class="weather-section">
+                    <h3>Координаты</h3>
+                    <p><strong>Широта:</strong> @Model.Coord.Lat</p>
+                    <p><strong>Долгота:</strong> @Model.Coord.Lon</p>
+                </div>
+
+                <div class="weather-section">
+                    <h3>Ветер</h3>
+                    <p><strong>Скорость:</strong> @Model.Wind.Speed м/с</p>
+                    <p><strong>Направление:</strong> @Model.Wind.Deg °</p>
+                </div>
+
+                <div class="weather-section">
+                    <h3>Облачность</h3>
+                    <p><strong>Процент облаков:</strong> @Model.Clouds.All %</p>
+                </div>
+
+                <div class="weather-section">
+                    <h3>Системные данные</h3>
+                    <p><strong>Страна:</strong> @Model.Sys.Country</p>
+                    <p><strong>Восход солнца:</strong> @DateTimeOffset.FromUnixTimeSeconds(Model.Sys.Sunrise).ToLocalTime().ToString("HH:mm:ss")</p>
+                    <p><strong>Закат солнца:</strong> @DateTimeOffset.FromUnixTimeSeconds(Model.Sys.Sunset).ToLocalTime().ToString("HH:mm:ss")</p>
+                </div>
+
+                <div class="weather-section">
+                    <h3>Дополнительно</h3>
+                    <p><strong>Видимость:</strong> @Model.Visibility м</p>
+                    <p><strong>Время данных:</strong> @DateTimeOffset.FromUnixTimeSeconds(Model.Dt).ToLocalTime().ToString("dd.MM.yyyy HH:mm:ss")</p>
+                    <p><strong>Часовой пояс:</strong> @(Model.Timezone / 3600) часов</p>
+                    <p><strong>ID города:</strong> @Model.Id</p>
+                    <p><strong>База данных:</strong> @Model.Base</p>
+                </div>
+            </div>
+        }
+
+        <div class="form-container">
+            <form asp-action="Index" method="get">
+                <div class="form-group">
+                    <label for="city">Введите город:</label>
+                    <input type="text" name="city" class="form-control" value="@(Model?.Name ?? "")" />
+                </div>
+                <button type="submit" class="btn">Получить погоду</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
