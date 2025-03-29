@@ -25,10 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <_ContentIncludedByDefault Remove="Views\Dish\AddDish.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Dish\EditDish.cshtml" />
     <_ContentIncludedByDefault Remove="Views\Dish\Index.cshtml" />

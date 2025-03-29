@@ -46,5 +46,7 @@ namespace WebApplication1.Models
         public Guid DeliveryId { get; set; }
         public virtual ICollection<UserFilter> Filters { get; set; }
         public ICollection<MailCheck> MailChecks { get; set; } = new List<MailCheck>();
+        
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }
