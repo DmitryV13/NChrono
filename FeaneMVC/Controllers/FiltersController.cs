@@ -84,32 +84,20 @@ namespace FeaneMVC.Controllers
         [HttpGet("filter-page")]
         public IActionResult FilterPage()
         {
-            var userId = _sessionService.GetUserId();
-            if (userId == Guid.Empty)
-            {
-                return Unauthorized("User ID could not be retrieved.");
-            }
-
-            var userFilters = _context.UserFilters
-                .Where(f => f.UserId == userId)
-                .Select(f => f.Filter)
-                .Distinct()
-                .ToList();
-
-            var filters = new UserFilterNotificationList
-            {
-                Filter = userFilters,
-                Id = userId,
-                maDictionary = new Dictionary<string, List<string>>()
-            };
-
-            foreach (var filter in userFilters)
-            {
-                filters.maDictionary.Add(filter, new List<string> { "sdfsdfdsf", "sdfdsfsdfsdf", "sdfsdfsdf" });
-            }
-
-            ViewData["Title"] = "Filters";
-            return View(filters);
+            List<WebApplication1.Controllers.NotificationFolder> list = new List<WebApplication1.Controllers.NotificationFolder>();
+            var a = new WebApplication1.Controllers.NotificationFolder();
+            var b = new List<Notification>();
+            var c  = new Notification();
+            c.Body = "dfghnngfds";
+            c.AppName = "jhgfvg";
+            c.Summary = "jhgvb";
+            c.Prefix = "jhgfh";
+            b.Add(c);
+            a.Name = "Work";
+            a.Notifications = b;
+            
+            list.Add(a);
+            return View(list);
         }
 
         [HttpGet("all")]
@@ -222,5 +210,12 @@ namespace FeaneMVC.Controllers
     public class ChatMessage
     {
         public string content { get; set; }
+    }
+    
+    
+    public class NotificationFolder
+    {
+        public string Name { get; set; }
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }
