@@ -58,8 +58,8 @@ namespace FeaneMVC.Controllers
                 .Distinct()
                 .ToList();
 
-            string email = "rentshopvehicle.webapplication@mail.ru";
-            string password = "BKRZTN085g5qRbxAmhhT";
+            string email = "wonderful_by@bk.ru";
+            string password = "3BSi4CrDCQYkmyAZCB6G";
             string imapServer = "imap.mail.ru";
             int imapPort = 993;
 
@@ -180,80 +180,95 @@ namespace FeaneMVC.Controllers
                 return null;
             }
 
-            var client = _httpClientFactory.CreateClient();
-            client.BaseAddress = new Uri(_chatBaseUrl); // Устанавливаем базовый адрес
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _chatApiKey);
-
-            var prompt = $"У меня есть список фильтров: {string.Join(", ", filters)}. " +
-                        $"Проанализируй следующий текст сообщения и выбери один фильтр из списка, " +
-                        $"который лучше всего ему соответствует. Верни результат в виде JSON-массива с одним элементом, " +
-                        $"содержащим только название фильтра без пояснений. " +
-                        $"Текст сообщения: '{messageText}'";
-
-            var payload = new
-            {
-                model = "gpt-3.5-turbo",
-                messages = new[]
-                {
-            new { role = "system", content = "Твоя задача — выбрать один наиболее подходящий фильтр из предоставленного списка для данного текста. Верни результат в виде JSON-массива с одним элементом, содержащим только название фильтра." },
-            new { role = "user", content = prompt }
-        },
-                max_tokens = 50
-            };
-
-            var jsonPayload = JsonSerializer.Serialize(payload);
-            var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
             try
             {
-                // Используем относительный путь, так как BaseAddress установлен
-                var response = await client.PostAsync("chat/completions", content);
-                if (!response.IsSuccessStatusCode)
+                using var client = _httpClientFactory.CreateClient();
+                client.BaseAddress = new Uri(_chatBaseUrl);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _chatApiKey);
+                var prompt = $"Проанализируй текст: '{messageText}'. " +
+               $"Выбери один наиболее подходящий фильтр из списка: {string.Join(", ", filters)}. " +
+               $"Оцени текст по наличию ключевых слов и общему контексту, чтобы выбрать фильтр, который лучше всего отражает суть сообщения. " +
+               $"Верни только JSON-массив с одним элементом – названием фильтра, например [\"filter\"].";
+
+                var payload = new
                 {
-                    Console.WriteLine($"API request failed with status: {response.StatusCode}");
-                    return null;
-                }
+                    model = "gpt-3.5-turbo",
+                    messages = new[]
+                    {
+                new { role = "system", content = "Верни только JSON-массив с одним элементом, например [\"filter\"], без пояснений и лишнего текста." },
+                new { role = "user", content = prompt }
+            },
+                    max_tokens = 30, // Увеличиваем, чтобы вместить длинные имена фильтров
+                    temperature = 0.3 // Уменьшаем для более строгого следования инструкциям
+                };
+
+                var response = await client.PostAsync("chat/completions",
+                    new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json"));
+
+                response.EnsureSuccessStatusCode();
 
                 var jsonResponse = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"[DEBUG] Raw API response: {jsonResponse}"); // Полный ответ для диагностики
+
                 var result = JsonSerializer.Deserialize<ChatResponse>(jsonResponse);
-                var filterJson = result.choices[0].message.content.Trim();
-
-                if (!filterJson.StartsWith("[") || !filterJson.EndsWith("]"))
+                if (result?.choices?.Length > 0)
                 {
-                    Console.WriteLine("Invalid JSON array format: " + filterJson);
+                    string filterContent = result.choices[0].message.content.Trim();
+                    Console.WriteLine($"[DEBUG] Filter content: {filterContent}"); // Содержимое сообщения
+
+                    // Проверяем, является ли ответ валидным JSON-массивом
+                    if (filterContent.StartsWith("[") && filterContent.EndsWith("]"))
+                    {
+                        try
+                        {
+                            var filterArray = JsonSerializer.Deserialize<string[]>(filterContent);
+                            if (filterArray?.Length > 0)
+                            {
+                                var selectedFilter = filterArray[0];
+                                return filters.Contains(selectedFilter) ? selectedFilter : null;
+                            }
+                        }
+                        catch (JsonException jsonEx)
+                        {
+                            Console.WriteLine($"[ERROR] Failed to parse filter content as JSON array: {jsonEx.Message}");
+                        }
+                    }
+
+                    // Обработка невалидного JSON (например, текст в кавычках или с обратными кавычками)
+                    var cleanedFilter = filterContent.Trim('`', '"', '[', ']', ' ', '\n');
+                    if (!string.IsNullOrEmpty(cleanedFilter) && filters.Contains(cleanedFilter))
+                    {
+                        Console.WriteLine($"[INFO] Fallback to cleaned filter: {cleanedFilter}");
+                        return cleanedFilter;
+                    }
+
+                    Console.WriteLine("[WARNING] No valid filter found in response");
                     return null;
                 }
 
-                var filterResult = JsonSerializer.Deserialize<List<string>>(filterJson);
-                if (filterResult == null || filterResult.Count == 0)
-                {
-                    return null;
-                }
-
-                var selectedFilter = filterResult[0];
-                return filters.Contains(selectedFilter) ? selectedFilter : null;
+                Console.WriteLine("[WARNING] No choices in API response");
+                return null;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error in GetBestMatchingFilter: {ex.Message}");
+                Console.WriteLine($"[ERROR] GetBestMatchingFilter failed: {ex.Message}");
                 return null;
             }
         }
-
         // Вспомогательный класс для десериализации ответа API
-        private class ChatResponse
+        public class ChatResponse
         {
-            public List<Choice> choices { get; set; }
+            public ChatChoice[] choices { get; set; }
+        }
 
-            public class Choice
-            {
-                public Message message { get; set; }
-            }
+        public class ChatChoice
+        {
+            public ChatMessage message { get; set; }
+        }
 
-            public class Message
-            {
-                public string content { get; set; }
-            }
+        public class ChatMessage
+        {
+            public string content { get; set; }
         }
 
         // Пример конечной точки для использования метода
