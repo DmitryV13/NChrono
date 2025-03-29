@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using FinalProject.Models;
 using WebApplication1.Models.Response;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
@@ -16,17 +15,14 @@ namespace WebApplication1.Controllers
         private readonly ILogger<HomeController> _logger; // Logger for logging information and errors
         private readonly WebApplication1.Interfaces.ISession _sessionService; // Service for session management
         private readonly IHttpContextAccessor _httpContextAccessor; // Accessor for HTTP context
-        private readonly ICartService _cartService; // Service for cart operations
         private readonly IUSer _user; // Service for user operations
         private readonly ApplicationDbContext _dbContext; // Database context
 
-        public HomeController( WebApplication1.Interfaces.ISession sessionService, IHttpContextAccessor httpContextAccessor, ICartService cartService, IUSer user, ApplicationDbContext dbContext)
+        public HomeController(WebApplication1.Interfaces.ISession sessionService, IHttpContextAccessor httpContextAccessor,IUSer user, ApplicationDbContext dbContext)
         { 
-
             _dbContext = dbContext;
             _sessionService = sessionService;
             _httpContextAccessor = httpContextAccessor;
-            _cartService = cartService;
             _user = user;
         }
         
@@ -121,6 +117,7 @@ namespace WebApplication1.Controllers
 
 
 
+            // Retrieve all dishes
 
             UserResponse user = null;
             user = await _user.GetOneUserByIdAsync(userId); // Asynchronously get user data
@@ -134,11 +131,8 @@ namespace WebApplication1.Controllers
       
             }
 
-            // Create a model to pass to the view
-            CartAndDishes model;
 
-
-            return View(null); // Return the view with the model
+            return View(); // Return the view with the model
         }
 
         // GET: Home/About
