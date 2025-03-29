@@ -74,9 +74,8 @@ namespace FeaneMVC.Controllers
             return Ok(new { Message = "Filters saved.", Filters = filters });
         }
 
-        // Добавлен обратно метод Index для страницы с формой
         [HttpGet]
-        [Route("~/Filters/Index")] // Переопределяем маршрут для доступа через /Filters/Index
+        [Route("~/Filters/Index")]
         public IActionResult Index()
         {
             return View();
@@ -135,6 +134,31 @@ namespace FeaneMVC.Controllers
             }
 
             return Ok(filters);
+        }
+
+        [HttpGet("add-mail")]
+        public IActionResult AddMail()
+        {
+            return View();
+        }
+
+        [HttpPost("add-mail")]
+        public IActionResult AddMail([FromForm] string email, [FromForm] string code)
+        {
+            var userId = _sessionService.GetUserId();
+            var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+            if (user != null)
+            {
+                var mailCheck = new MailCheck
+                {
+                    Email = email,
+                    Code = code,
+                    UserId = userId
+                };
+                _context.MailChecks.Add(mailCheck);
+                _context.SaveChanges();
+            }
+            return Ok();
         }
 
         private async Task<List<string>> GetFiltersFromAI(string userInput)
@@ -198,28 +222,5 @@ namespace FeaneMVC.Controllers
     public class ChatMessage
     {
         public string content { get; set; }
-    }
-
-    [HttpGet("add-mail")]
-    public IActionResult AddMail()
-    {
-        return View();
-    }
-
-    [HttpPost("add-mail")]
-    public IActionResult AddMail([FromForm] string email, [FromForm] string code)
-    {
-        var userId = _sessionService.GetUserId();
-        var user = _context.Users.FirstOrDefault(u => u.Id == userId);
-        if (user != null)
-        {
-            MailCheck mailCheck = new MailCheck();
-            mailCheck.Email = email;
-            mailCheck.Code = code;
-            mailCheck.UserId = userId;
-            _context.MailChecks.Add(mailCheck);
-            _context.SaveChanges();
-        }
-        return Ok();
     }
 }
