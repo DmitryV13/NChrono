@@ -58,8 +58,8 @@ namespace FeaneMVC.Controllers
                 .Distinct()
                 .ToList();
 
-            string email = "vistovskii2002@mail.ru";
-            string password = "qg6fcfBMn0eWNbyg6Vyr";
+            string email = "rentshopvehicle.webapplication@mail.ru";
+            string password = "BKRZTN085g5qRbxAmhhT";
             string imapServer = "imap.mail.ru";
             int imapPort = 993;
 
