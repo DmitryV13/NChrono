@@ -153,4 +153,10 @@ namespace WebApplication1.Controllers
             return View(); // Return the view for the Menu page
         }
     }
+    
+    public class NotificationFolder
+    {
+        public string Name { get; set; }
+        public List<Notification> Notifications { get; set; } = new List<Notification>();
+    }
 }

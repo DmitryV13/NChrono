@@ -1,455 +1,269 @@
-@model FeaneMVC.Models.UserFilterNotificationList
-
+@model List<WebApplication1.Controllers.NotificationFolder>
 @{
-    ViewData["Title"] = "Email Filters";
-    Layout = null;
-    // Sample email data structure for demonstration
-    var emailSamples = new List<dynamic>();
-
-    // Generate some sample emails for demonstration
-    var subjects = new[] {
-        "Meeting Tomorrow", "Project Update", "Invoice #12345",
-        "Weekly Report", "Vacation Request", "New Product Launch",
-        "Customer Feedback", "System Maintenance", "Team Building Event"
-    };
-
-    var senders = new[] {
-        "john.doe@example.com", "sarah.smith@company.com", "tech-support@service.net",
-        "notifications@system.org", "hr@company.com", "marketing@business.com"
-    };
-
-    var random = new Random();
-
-    foreach (var filter in Model.maDictionary.Keys)
-    {
-        // Create 5-10 sample emails for each filter
-        var emailCount = random.Next(5, 11);
-        for (int i = 0; i < emailCount; i++)
-        {
-            var subject = subjects[random.Next(subjects.Length)];
-            var sender = senders[random.Next(senders.Length)];
-            var date = DateTime.Now.AddDays(-random.Next(1, 30)).ToString("MMM d");
-            var preview = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.";
-            var isUnread = random.Next(2) == 0; // 50% chance of being unread
-
-            emailSamples.Add(new
-            {
-                Id = Guid.NewGuid().ToString(),
-                FilterName = filter,
-                Subject = subject,
-                Sender = sender,
-                Date = date,
-                Preview = preview,
-                IsUnread = isUnread
-            });
-        }
-    }
+    ViewData["Title"] = "Notification Folders";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@ViewData["Title"]</title>
+<div class="container mx-auto py-8 px-4">
+    <h1 class="text-2xl font-bold mb-6">Notification Folders</h1>
+    
+    <div class="grid grid-cols-1 gap-4 max-w-3xl mx-auto">
+        @foreach (var folder in Model)
+        {
+            <div class="folder-collapsible w-full" data-folder-id="@folder.GetHashCode()">
+                <div class="card transition-shadow hover:shadow-md">
+                    <div class="collapsible-trigger w-full text-left" onclick="toggleFolder(@folder.GetHashCode())">
+                        <div class="card-header pb-2">
+                            <div class="flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <i class="h-5 w-5 text-blue-500"></i> <!-- Иконка по умолчанию -->
+                                    <h3 class="card-title text-lg">@folder.Name</h3>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <span class="badge badge-secondary">@folder.Notifications.Count</span>
+                                    <i class="chevron-icon" id="chevron-@folder.GetHashCode()"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-content folder-summary" id="summary-@folder.GetHashCode()">
+                            <p class="card-description">
+                                @if (folder.Notifications.Count == 0)
+                                {
+                                    <text>No notifications</text>
+                                }
+                                else
+                                {
+                                    <text>@folder.Notifications.Count notification@(folder.Notifications.Count == 1 ? "" : "s")</text>
+                                }
+                            </p>
+                        </div>
+                    </div>
+                    
+                    <div class="collapsible-content hidden" id="content-@folder.GetHashCode()">
+                        <div class="card-content">
+                            <hr class="separator my-2" />
+                            <div class="space-y-4 pt-2">
+                                @if (folder.Notifications.Count == 0)
+                                {
+                                    <p class="text-center text-muted-foreground py-4">No notifications in this folder</p>
+                                }
+                                else
+                                {
+                                    foreach (var notification in folder.Notifications)
+                                    {
+                                        <div class="p-3 rounded-lg bg-background">
+                                            <div class="flex items-start gap-3">
+                                                <div class="flex-1">
+                                                    <div class="flex justify-between items-start">
+                                                        <h3 class="font-medium">
+                                                            @(notification.Summary ?? "No summary")
+                                                        </h3>
+                                                        <span class="text-xs text-muted-foreground">@notification.TimeString</span>
+                                                    </div>
+                                                    <p class="text-sm text-muted-foreground mt-1">
+                                                        @(notification.Prefix != null ? $"{notification.Prefix}: " : "")
+                                                        @(notification.Body ?? "No body")
+                                                    </p>
+                                                    <p class="text-xs text-gray-500 mt-1">From: @(notification.AppName ?? "Unknown app")</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
     <style>
-        :root {
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --background: #f8fafc;
-            --sidebar-bg: #f1f5f9;
-            --card-bg: #ffffff;
-            --text: #1e293b;
-            --text-secondary: #64748b;
-            --border: #e2e8f0;
-            --shadow: rgba(0, 0, 0, 0.1);
-            --radius: 0.5rem;
-            --transition: all 0.3s ease;
-            --header-height: 64px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-        }
-
-        body {
-            background: var(--background);
-            color: var(--text);
-            min-height: 100vh;
+        /* Base styles */
+        .card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+            background-color: white;
             overflow: hidden;
         }
-
-        .app-container {
-            display: flex;
-            height: 100vh;
+        
+        .card-header {
+            padding: 1rem 1.5rem;
         }
-
-        /* Header */
-        .header {
-            height: var(--header-height);
-            display: flex;
-            align-items: center;
-            padding: 0 1.5rem;
-            background: var(--card-bg);
-            border-bottom: 1px solid var(--border);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+        
+        .card-content {
+            padding: 1rem 1.5rem;
         }
-
-        .header h1 {
-            font-size: 1.25rem;
+        
+        .card-title {
             font-weight: 600;
         }
-
-        /* Sidebar */
-        .sidebar {
-            width: 280px;
-            background: var(--sidebar-bg);
-            border-right: 1px solid var(--border);
-            height: 100vh;
-            overflow-y: auto;
-            transition: var(--transition);
+        
+        .card-description {
+            color: #64748b;
+            font-size: 0.875rem;
         }
-
-        .sidebar-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .sidebar-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-        }
-
-        .filter-list {
-            list-style: none;
-            padding: 0.5rem 0;
-        }
-
-        .filter-item {
-            padding: 0.75rem 1.5rem;
-            cursor: pointer;
-            display: flex;
+        
+        /* Utility classes */
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .items-start { align-items: flex-start; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-3 { gap: 0.75rem; }
+        .ml-2 { margin-left: 0.5rem; }
+        .my-2 { margin-top: 0.5rem; margin-bottom: 0.5rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .py-4 { padding-top: 1rem; padding-bottom: 1rem; }
+        .pt-2 { padding-top: 0.5rem; }
+        .pb-2 { padding-bottom: 0.5rem; }
+        .p-3 { padding: 0.75rem; }
+        .text-center { text-align: center; }
+        .text-left { text-align: left; }
+        .text-lg { font-size: 1.125rem; }
+        .text-sm { font-size: 0.875rem; }
+        .text-xs { font-size: 0.75rem; }
+        .font-medium { font-weight: 500; }
+        .font-semibold { font-weight: 600; }
+        .font-bold { font-weight: 700; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-full { border-radius: 9999px; }
+        .w-full { width: 100%; }
+        .h-5 { height: 1.25rem; }
+        .w-5 { width: 1.25rem; }
+        .h-10 { height: 2.5rem; }
+        .w-10 { width: 2.5rem; }
+        .flex-1 { flex: 1 1 0%; }
+        .hidden { display: none; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        
+        /* Colors */
+        .text-blue-500 { color: #3b82f6; }
+        .text-gray-500 { color: #64748b; }
+        .text-muted-foreground { color: #64748b; }
+        .bg-background { background-color: #ffffff; }
+        
+        /* Badge styles */
+        .badge {
+            display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
-            transition: var(--transition);
-            border-left: 3px solid transparent;
-        }
-
-        .filter-item:hover {
-            background: rgba(99, 102, 241, 0.1);
-        }
-
-        .filter-item.active {
-            background: rgba(99, 102, 241, 0.15);
-            border-left: 3px solid var(--primary);
-        }
-
-        .filter-icon {
-            color: var(--text-secondary);
-        }
-
-        .filter-name {
-            flex: 1;
-        }
-
-        .filter-count {
-            background: var(--primary);
-            color: white;
             border-radius: 9999px;
             padding: 0.125rem 0.5rem;
             font-size: 0.75rem;
             font-weight: 500;
+            line-height: 1;
         }
-
-        /* Content */
-        .content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            overflow: hidden;
+        
+        .badge-secondary {
+            background-color: #e2e8f0;
+            color: #475569;
         }
-
-        .email-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
+        
+        /* Separator */
+        .separator {
+            height: 1px;
+            background-color: #e2e8f0;
+            border: none;
         }
-
-        .email-item {
-            padding: 1rem;
-            border-radius: var(--radius);
-            background: var(--card-bg);
-            margin-bottom: 0.75rem;
-            cursor: pointer;
-            border: 1px solid var(--border);
-            transition: var(--transition);
-            animation: fadeIn 0.3s ease-out;
-            display: none; /* Hide by default */
-        }
-
-        .email-item:hover {
-            box-shadow: 0 4px 12px var(--shadow);
-            transform: translateY(-2px);
-        }
-
-        .email-header {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.5rem;
-        }
-
-        .email-sender {
-            font-weight: 500;
-            color: var(--text);
-        }
-
-        .email-date {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-        }
-
-        .email-subject {
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            color: var(--text);
-        }
-
-        .email-preview {
-            color: var(--text-secondary);
-            font-size: 0.875rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-        }
-
-        .unread .email-sender,
-        .unread .email-subject {
-            font-weight: 700;
-        }
-
-        .unread .email-subject::before {
-            content: "";
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            margin-right: 8px;
-        }
-
-        .empty-state {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            color: var(--text-secondary);
-            text-align: center;
-            padding: 2rem;
-        }
-
-        .empty-icon {
-            font-size: 3rem;
-            margin-bottom: 1rem;
-            color: var(--border);
-        }
-
-        .empty-title {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-        }
-
-        .empty-description {
-            max-width: 400px;
-        }
-
-        /* Mobile Responsive */
-        @@media (max-width: 768px) {
-        .app-container {
-            flex-direction: column;
-        }
-
-        .sidebar {
+        
+        /* Grid */
+        .container {
             width: 100%;
-            height: auto;
-            max-height: 50vh;
+            margin-left: auto;
+            margin-right: auto;
         }
-
-        .content {
-            height: auto;
+        
+        .grid {
+            display: grid;
         }
+        
+        .grid-cols-1 {
+            grid-template-columns: repeat(1, minmax(0, 1fr));
         }
-
-        /* Animations */
-        @@keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        
+        .gap-4 {
+            gap: 1rem;
         }
-
-        @@keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        
+        .max-w-3xl {
+            max-width: 48rem;
         }
-
-        /* Dark Mode */
-        @@media (prefers-color-scheme: dark) {
-        :root {
-            --background: #0f172a;
-            --sidebar-bg: #1e293b;
-            --card-bg: #1e293b;
-            --text: #f1f5f9;
-            --text-secondary: #94a3b8;
-            --border: #334155;
-            --shadow: rgba(0, 0, 0, 0.3);
+        
+        .mx-auto {
+            margin-left: auto;
+            margin-right: auto;
         }
+        
+        .py-8 {
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+        
+        .px-4 {
+            padding-left: 1rem;
+            padding-right: 1rem;
+        }
+        
+        .mb-6 {
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Transitions */
+        .transition-shadow {
+            transition-property: box-shadow;
+            transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+            transition-duration: 150ms;
+        }
+        
+        .hover\:shadow-md:hover {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Icons */
+        .chevron-icon {
+            width: 1rem;
+            height: 1rem;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+        
+        .chevron-down {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+        }
+        
+        .chevron-up {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='18 15 12 9 6 15'%3E%3C/polyline%3E%3C/svg%3E");
         }
     </style>
-</head>
-<body>
-<div class="app-container">
-    <!-- Sidebar -->
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <h2 class="sidebar-title">Filters</h2>
-        </div>
-        <ul class="filter-list">
-            @foreach (var filter in Model.maDictionary.Keys)
-            {
-                var emailCount = emailSamples.Count(e => e.FilterName == filter);
-                <li class="filter-item" data-filter="@filter">
-                        <span class="filter-icon">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                            </svg>
-                        </span>
-                    <span class="filter-name">@filter</span>
-                    <span class="filter-count">@emailCount</span>
-                </li>
-            }
-        </ul>
-    </aside>
 
-    <!-- Content -->
-    <main class="content">
-        <header class="header">
-            <h1 id="current-filter">Select a filter</h1>
-        </header>
-        <div class="email-list" id="email-list">
-            <div class="empty-state" id="empty-state">
-                <div class="empty-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                        <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                    </svg>
-                </div>
-                <h3 class="empty-title">Select a filter</h3>
-                <p class="empty-description">Choose a filter from the sidebar to view emails</p>
-            </div>
 
-            @foreach (var email in emailSamples)
-            {
-                <div class="email-item @(email.IsUnread ? "unread" : "")" data-filter="@email.FilterName">
-                    <div class="email-header">
-                        <span class="email-sender">@email.Sender</span>
-                        <span class="email-date">@email.Date</span>
-                    </div>
-                    <h3 class="email-subject">@email.Subject</h3>
-                    <p class="email-preview">@email.Preview</p>
-                </div>
-            }
-        </div>
-    </main>
-</div>
-
-<script>
-    
-    document.addEventListener('DOMContentLoaded', function() {
-        const filterList = document.querySelector('.filter-list');
-        const emailList = document.getElementById('email-list');
-        const currentFilterTitle = document.getElementById('current-filter');
-        const emptyState = document.getElementById('empty-state');
-
-        // Получение всех фильтров и их сообщений
-        function loadFilters() {
-            fetch('/api/filters/all')
-                .then(response => response.json())
-                .then(data => {
-                    // Очистка существующих фильтров
-                    filterList.innerHTML = '';
-
-                    // Заполнение фильтров и сообщений
-                    Object.keys(data).forEach((filter, index) => {
-                        const filterItem = document.createElement('li');
-                        filterItem.className = 'filter-item';
-                        filterItem.textContent = filter;
-                        filterItem.dataset.filter = filter;
-
-                        filterItem.addEventListener('click', () => {
-                            selectFilter(filter, data[filter]);
-                        });
-
-                        filterList.appendChild(filterItem);
-                    });
-
-                    if (Object.keys(data).length === 0) {
-                        emptyState.style.display = 'flex';
-                        emailList.innerHTML = '';
-                        currentFilterTitle.textContent = 'No filters found';
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading filters:', error);
-                });
-        }
-
-        // Выбор фильтра и отображение сообщений
-        function selectFilter(filterName, messages) {
-            currentFilterTitle.textContent = filterName;
-            emailList.innerHTML = '';
-
-            if (messages.length === 0) {
-                emptyState.style.display = 'flex';
-                return;
-            }
-
-            emptyState.style.display = 'none';
-
-            messages.forEach((message, index) => {
-                const emailItem = document.createElement('div');
-                emailItem.className = 'email-item';
-                emailItem.textContent = message;
-                emailItem.style.animationDelay = `${index * 0.05}s`;
-                emailItem.style.display = 'block';
-
-                emailList.appendChild(emailItem);
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.folder-collapsible').forEach(function(folder) {
+                const folderId = folder.getAttribute('data-folder-id');
+                const chevronIcon = document.getElementById('chevron-' + folderId);
+                chevronIcon.classList.add('chevron-down');
             });
+        });
+        
+        function toggleFolder(folderId) {
+            const content = document.getElementById('content-' + folderId);
+            const summary = document.getElementById('summary-' + folderId);
+            const chevronIcon = document.getElementById('chevron-' + folderId);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                summary.classList.add('hidden');
+                chevronIcon.classList.remove('chevron-down');
+                chevronIcon.classList.add('chevron-up');
+            } else {
+                content.classList.add('hidden');
+                summary.classList.remove('hidden');
+                chevronIcon.classList.remove('chevron-up');
+                chevronIcon.classList.add('chevron-down');
+            }
         }
-
-        // Загрузка фильтров при запуске
-        loadFilters();
-    });
-
-</script>
-</body>
-</html>
+    </script>
