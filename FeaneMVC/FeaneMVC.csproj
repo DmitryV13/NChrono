@@ -27,4 +27,14 @@
     <Folder Include="Migrations\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Views\Dish\AddDish.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Dish\EditDish.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Dish\Index.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Cart\Cart.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Payment\Checkout.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Payment\Confirmation.cshtml" />
+    <_ContentIncludedByDefault Remove="Views\Reservation\Book.cshtml" />
+  </ItemGroup>
+
 </Project>

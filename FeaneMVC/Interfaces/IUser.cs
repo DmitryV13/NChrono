@@ -51,10 +51,5 @@ namespace WebApplication1.Interfaces
         // Logs out the user and clears session information
         ResponseMain UserLogout();
 
-        // Asynchronously updates the address for a user
-        Task<UserResponse> UpdateAddress(UserData delivery, DeliveryAddress data);
-
-        // Asynchronously retrieves a delivery address by user identifier
-        Task<DeliveryResponse> GetOneAddressByUserIdAsync(Guid userId);
     }
 }

@@ -1,10 +1,7 @@
 using FeaneMVC.Repository;
 using FinalProject.DbModel;
-using FinalProject.Models;
-using FoodShop.Repository;
 using Microsoft.EntityFrameworkCore;
 using WebApplication1.Attributes;
-using WebApplication1.Factory;
 using WebApplication1.Interfaces;
 using WebApplication1.Repository;
 
@@ -31,16 +28,7 @@ builder.Services.AddScoped<AdminModeAttribute>();
 builder.Services.AddScoped<AdminOrVipModeAttribute>();
 builder.Services.AddScoped<VipModeAttribute>();
 builder.Services.AddScoped<ModeratorModeAttribute>();
-builder.Services.AddTransient<CartFactory>(provider =>
-    new VipFactoryCart(provider.GetRequiredService<ApplicationDbContext>()));
-builder.Services.AddTransient<CartFactory>(provider =>
-    new RegularUserCart(provider.GetRequiredService<ApplicationDbContext>()));
-builder.Services.AddScoped<IReservation, ReservationRepository>();
-builder.Services.AddScoped<IPaymentGateway, PaymentProcessor>();
 builder.Services.AddScoped<IUSer, UserRepository>();
-builder.Services.AddScoped<ICartService, RegularUserCartService>();
-builder.Services.AddScoped<ICartService, VIPUserCartService>();
-builder.Services.AddScoped<IDishes, DishRepository>();
 builder.Services.AddSingleton<INotification>(sp => NotificationService.Instance);
 builder.Services.AddScoped<WebApplication1.Interfaces.ISession, SessionRepository>();
 

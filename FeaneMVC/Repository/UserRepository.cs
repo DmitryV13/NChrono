@@ -1,16 +1,12 @@
-﻿using WebApplication1.Interfaces;
-using WebApplication1.Models.Response;
-using WebApplication1.Models;
-using FinalProject.DbModel;
+﻿using FinalProject.DbModel;
 using Microsoft.EntityFrameworkCore;
-using System.Linq;
-using WebApplication1.Models.Enums;
-using Microsoft.Extensions.Logging;
-using FinalProject.Models;
 using WebApplication1.Helpers;
-using Microsoft.AspNetCore.Mvc;
+using WebApplication1.Interfaces;
+using WebApplication1.Models;
+using WebApplication1.Models.Enums;
+using WebApplication1.Models.Response;
 
-namespace FoodShop.Repository
+namespace FeaneMVC.Repository
 {
     public class UserRepository : IUSer
     {
@@ -92,29 +88,6 @@ namespace FoodShop.Repository
                 // Hash the user's password
                 user.Password = LoginHelper.HashGen(user.Password);
 
-                // Create a new cart for the user
-                var cart = new Cart
-                {
-                    CartId = Guid.NewGuid(),
-                    UserId = user.Id
-                };
-
-                // Create a new delivery address
-                var deliveryAddress = new DeliveryAddress
-                {
-                    Id = Guid.NewGuid(),
-                    UserId = user.Id
-                };
-
-                // Associate the user with the cart and delivery address
-                user.DeliveryId = deliveryAddress.Id;
-                user.CartId = cart.CartId;
-                user.Delivery = deliveryAddress;
-                user.Cart = cart;
-
-                // Add the cart and delivery address to the context
-                _context.Cart.Add(cart);
-                _context.DeliveryAddresses.Add(deliveryAddress);
                 _context.Users.Add(user);
 
                 // Save changes to the database
@@ -129,106 +102,6 @@ namespace FoodShop.Repository
 
                 Console.WriteLine(ex.InnerException?.Message ?? ex.Message);
                 return new UserResponse { Message = "An error occurred while adding the user.", Status = false };
-            }
-        }
-
-        // Updates the address with new data
-        public async Task<UserResponse> UpdateAddress(UserData addressOld, DeliveryAddress newAddress)
-        {
-            try
-            {
-                if (newAddress == null)
-                {
-                    return new UserResponse { Message = "No new data provided.", Status = false }; // Validate new address data
-                }
-
-                // Find the existing delivery address by UserId
-                var delivery = await _context.DeliveryAddresses
-                    .SingleOrDefaultAsync(d => d.UserId == addressOld.Id);
-
-                if (delivery == null)
-                {
-                    return new UserResponse { Message = "Address not found.", Status = false }; // Check if address exists
-                }
-
-                // Update address fields if provided
-                if (!string.IsNullOrEmpty(newAddress.MoreInfo))
-                {
-                    delivery.MoreInfo = newAddress.MoreInfo;
-                }
-
-                if (!string.IsNullOrEmpty(newAddress.City))
-                {
-                    delivery.City = newAddress.City;
-                }
-
-                if (!string.IsNullOrEmpty(newAddress.Street))
-                {
-                    delivery.Street = newAddress.Street;
-                }
-
-                if (!string.IsNullOrEmpty(newAddress.Country))
-                {
-                    delivery.Country = newAddress.Country;
-                }
-
-                if (!string.IsNullOrEmpty(newAddress.ParcelIndex))
-                {
-                    delivery.ParcelIndex = newAddress.ParcelIndex;
-                }
-
-                // Update the delivery address for the user
-                var user = await _context.Users.SingleOrDefaultAsync(U => U.Id == addressOld.Id);
-                user.Delivery = delivery;
-
-                // Save changes to the database
-                await _context.SaveChangesAsync();
-
-                return new UserResponse { Message = "Address updated successfully", Status = true, DeliveryAddress = delivery };
-            }
-            catch (Exception ex)
-            {
-
-                _logger.LogError(ex, "An error occurred while updating the address.");
-
-                return new UserResponse { Message = "An error occurred while updating the address.", Status = false };
-            }
-        }
-        // Retrieves a delivery address by UserId
-        public async Task<DeliveryResponse> GetOneAddressByUserIdAsync(Guid userId)
-        {
-            try
-            {
-                // Find the delivery address by UserId
-                var delivery = await _context.DeliveryAddresses
-                    .FirstOrDefaultAsync(d => d.UserId == userId);
-
-                if (delivery == null)
-                {
-                    return new DeliveryResponse
-                    {
-                        Message = "Address not found.",
-                        Success = false
-                    };
-                }
-
-                return new DeliveryResponse
-                {
-                    Message = "Address retrieved successfully.",
-                    Success = true,
-                    DeliveryAddress = delivery
-                };
-            }
-            catch (Exception ex)
-            {
-                // Log the exception, if you have a logger
-                // _logger.LogError(ex, "An error occurred while retrieving the address.");
-
-                return new DeliveryResponse
-                {
-                    Message = "An error occurred while retrieving the address.",
-                    Success = false
-                };
             }
         }
 
@@ -278,8 +151,6 @@ namespace FoodShop.Repository
                 }
 
                 var user = _context.Users
-                    .Include(u => u.Cart)
-                    .Include(u => u.Delivery)
                     .FirstOrDefault(u => u.Id == id);
 
                 if (user == null)
@@ -287,16 +158,6 @@ namespace FoodShop.Repository
                     return new UserResponse { Message = "User not found", Status = false };
                 }
 
-                // Remove all records related to the user
-                if (user.Cart != null)
-                {
-                    _context.Cart.Remove(user.Cart);
-                }
-
-                if (user.Delivery != null)
-                {
-                    _context.DeliveryAddresses.Remove(user.Delivery);
-                }
 
                 _context.Users.Remove(user);
                 _context.SaveChanges();
