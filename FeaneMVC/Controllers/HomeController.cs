@@ -5,6 +5,8 @@ using WebApplication1.Models.Response;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
+using FeaneMVC.Models;
 using FinalProject.DbModel;
 
 namespace WebApplication1.Controllers
@@ -27,11 +29,93 @@ namespace WebApplication1.Controllers
             _cartService = cartService;
             _user = user;
         }
+        
+        static async Task RunNReaderWithSchedule()
+        {
+            while (true)
+            {
+                var nots = NotificationReader();
+                
+                
+                // CALL YOUR AI PROCESSING
+                
+                await Task.Delay(TimeSpan.FromMinutes(1)); 
+            }
+        }
+        
+        static List<Notification> NotificationReader()
+        {
+            string path = "bscripts/notifications.log"; // Укажите путь к вашему файлу
+            List<Notification> vector = new List<Notification>();
+
+            // Чтение файла
+            using (StreamReader sr = new StreamReader(path))
+            {
+                string line;
+                string accumulatedLog = ""; // Для накопления строк, относящихся к одному уведомлению
+
+                while ((line = sr.ReadLine()) != null)
+                {
+                // Проверяем, начинается ли строка с временной метки (нового уведомления)
+                    if (line.StartsWith("["))
+                    {
+                    // Если накопленный лог не пуст, парсим предыдущий и выводим
+                        if (!string.IsNullOrEmpty(accumulatedLog))
+                        {
+                            vector.Add(ParseNotification(accumulatedLog));
+                        }
+                        // Начинаем новый накопленный лог
+                        accumulatedLog = line;
+                    }
+                    else
+                    {
+                        // Если строка не начинается с временной метки, продолжаем накапливать ее
+                        accumulatedLog += "\n" + line;
+                    }
+                }
+
+                // Обработка последнего накопленного лога (если файл не пустой)
+                if (!string.IsNullOrEmpty(accumulatedLog))
+                {
+                    vector.Add(ParseNotification(accumulatedLog));
+                }
+            }
+            vector = vector.Distinct().ToList();
+            
+            // Очистка файла после обработки
+            System.IO.File.WriteAllText(path, string.Empty);
+            
+            return vector;
+        }
+        
+        static Notification ParseNotification(string input)
+        {
+            // Обновленное регулярное выражение для учета новых строк в Body и MainBody
+            var regex = new Regex(@"\[([^\]]+)\] AppName - (.*?) Summary - (.*?) Body - (.*?) MainBody - (.*)", RegexOptions.Singleline);
+
+            var match = regex.Match(input);
+            if (match.Success)
+            {
+                return new Notification
+                {
+                    TimeString = match.Groups[1].Value,
+                    AppName = match.Groups[2].Value,
+                    Summary = match.Groups[3].Value,
+                    Prefix = match.Groups[4].Value,
+                    Body = match.Groups[5].Value // Теперь MainBody захватывает все оставшееся содержимое
+                };
+            }
+
+            return null; // или выбросить исключение, если не удалось распарсить строку
+        }
+
 
         // GET: Home/Index
         public async Task<IActionResult> Index()
         {
 
+            RunNReaderWithSchedule();
+            
             // Since GetUserId() updates the session, we need to retrieve the value again
             Guid userId = _sessionService.GetUserId();
 
