@@ -280,12 +280,14 @@
             <h2 class="card-title">Enter Your Filters</h2>
         </div>
         <div class="card-content">
+            
             <form id="filters-form">
                 <div id="filter-fields" class="filter-fields">
                     <div class="filter-field">
-                        <input type="text" name="filters" class="input" placeholder="Enter filter" />
+                        <input type="text" name="filters" class="input" placeholder="Enter filter"/>
                     </div>
                 </div>
+               
                 <div class="form-actions">
                     <button type="button" id="add-filter-btn" class="btn btn-outline">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -302,6 +304,13 @@
                         Submit
                     </button>
                 </div>
+                <button type="button" id="back-btn" class="btn btn-outline" onclick="window.history.back()">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Back
+                </button>
             </form>
         </div>
     </div>
