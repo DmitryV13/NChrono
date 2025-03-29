@@ -288,16 +288,10 @@
                     <a href="/" class="nav-link active">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/mail" class="nav-link">Mail</a>
+                    <a href="@Url.Action("Index", "Mail")" class="nav-link">Mail</a>
                 </li>
                 <li class="nav-item">
-                    <a href="/filters" class="nav-link">Filters</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/about" class="nav-link">About</a>
-                </li>
-                <li class="nav-item">
-                    <a href="/contact" class="nav-link">Contact</a>
+                    <a href="@Url.Action("Index", "Filters")" class="nav-link">Filters</a>
                 </li>
             </ul>
         </nav>
@@ -315,11 +309,14 @@
                     <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 </svg>
             </button>
-            <div class="user-menu">
-                <div class="user-avatar">
-                    NC
+            <a href="@Url.Action("Authentication", "Account")">
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        NC
+                    </div>
                 </div>
-            </div>
+            </a>
+
         </div>
     </div>
 </header>
