@@ -16,6 +16,8 @@ namespace FinalProject.DbModel
         public DbSet<UserFilter> UserFilters { get; set; }
         public DbSet<MailCheck>  MailChecks { get; set; }
         public DbSet<MailMessage> MailMessages { get; set; }
+        
+        public DbSet<Notification> Notifications { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -37,10 +39,19 @@ namespace FinalProject.DbModel
                 .WithMany(u => u.MailChecks)    
                 .HasForeignKey(m => m.UserId)   
                 .OnDelete(DeleteBehavior.Restrict);
+            
             modelBuilder.Entity<MailMessage>()
                 .HasIndex(m => new { m.UniqueId, m.UserId })
                 .IsUnique();
             
+            modelBuilder.Entity<Notification>()
+                .HasKey(n => n.Id); 
+
+            modelBuilder.Entity<Notification>()
+                .HasOne(n => n.User) 
+                .WithMany(u => u.Notifications) 
+                .HasForeignKey(n => n.UserId) 
+                .OnDelete(DeleteBehavior.Cascade);
         }
 
 

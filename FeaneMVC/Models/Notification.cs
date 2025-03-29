@@ -1,7 +1,17 @@
 namespace FeaneMVC.Models;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using WebApplication1.Models;
 
 public class Notification
 {
+    [Key]
+    public Guid Id { get; set; }
+    
+    public Guid UserId { get; set; }  // Это свойство необходимо для связи с UserData
+    
+    [ForeignKey("UserId")]  // Указываем внешнюю связь
+    public UserData User { get; set; }
     public string TimeString { get; set; }
     public string AppName { get; set; }
     public string Summary { get; set; }
