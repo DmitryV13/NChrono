@@ -1,0 +1,522 @@
+@{
+    ViewData["Title"] = "Add Mail Account";
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewData["Title"]</title>
+    <style>
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --background: #f8fafc;
+            --card-bg: #ffffff;
+            --text: #1e293b;
+            --text-secondary: #64748b;
+            --border: #e2e8f0;
+            --shadow: rgba(0, 0, 0, 0.1);
+            --error: #ef4444;
+            --success: #10b981;
+            --radius: 0.5rem;
+            --transition: all 0.3s ease;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: var(--radius);
+            box-shadow: 0 8px 30px var(--shadow);
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .card-header {
+            padding: 2rem 2rem 1rem;
+            text-align: center;
+        }
+
+        .card-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 0.5rem;
+            animation: slideDown 0.5s ease-out;
+        }
+
+        .card-description {
+            color: var(--text-secondary);
+            margin-bottom: 1rem;
+            animation: slideDown 0.5s ease-out 0.1s forwards;
+            opacity: 0;
+        }
+
+        .card-content {
+            padding: 1rem 2rem 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+            animation: slideUp 0.5s ease-out forwards;
+            opacity: 0;
+        }
+
+        .form-group:nth-child(1) {
+            animation-delay: 0.2s;
+        }
+
+        .form-group:nth-child(2) {
+            animation-delay: 0.3s;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 1rem;
+            transition: var(--transition);
+            background-color: white;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .form-input.error {
+            border-color: var(--error);
+        }
+
+        .form-error {
+            color: var(--error);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .form-error.visible {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .form-hint {
+            color: var(--text-secondary);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+            animation: slideUp 0.5s ease-out 0.4s forwards;
+            opacity: 0;
+        }
+
+        .btn {
+            padding: 0.875rem 1.5rem;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: white;
+            flex: 1;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4f46e5, #4338ca);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .btn-outline:hover {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+
+        .btn-icon {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            padding: 1rem 1.5rem;
+            background: white;
+            color: var(--text);
+            border-radius: var(--radius);
+            box-shadow: 0 10px 30px var(--shadow);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 1000;
+            max-width: 350px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error);
+        }
+
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.5rem;
+            height: 1.5rem;
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            margin-bottom: 0.25rem;
+        }
+
+        .toast-message {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+
+        .loading {
+            display: inline-block;
+            width: 1.5rem;
+            height: 1.5rem;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 0.8s linear infinite;
+            margin-right: 0.5rem;
+            display: none;
+        }
+
+        @@keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @@keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @@keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @@keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Dark Mode */
+        @@media (prefers-color-scheme: dark) {
+            :root {
+                --background: #0f172a;
+                --card-bg: #1e293b;
+                --text: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border: #334155;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+
+            body {
+                background: linear-gradient(135deg, #1e293b, #0f172a);
+            }
+
+            .card {
+                background: rgba(30, 41, 59, 0.9);
+            }
+
+            .form-input {
+                background-color: rgba(15, 23, 42, 0.3);
+                color: var(--text);
+                border-color: var(--border);
+            }
+
+            .btn-outline:hover {
+                background: #1e293b;
+                border-color: #475569;
+            }
+
+            .toast {
+                background: #1e293b;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <div class="card-header">
+                <h1 class="card-title">Add Mail Account</h1>
+                <p class="card-description">Connect your email account to enable filtering</p>
+            </div>
+            <div class="card-content">
+                <form id="add-mail-form" action="/api/filters/add-mail" method="post">
+                    <div class="form-group">
+                        <label for="email" class="form-label">Email Address</label>
+                        <input type="email" id="email" name="email" class="form-input" placeholder="your.email@example.com" required>
+                        <div id="email-error" class="form-error">Please enter a valid email address</div>
+                        <div class="form-hint">We'll use this to connect to your mail provider</div>
+                    </div>
+                    <div class="form-group">
+                        <label for="code" class="form-label">Application Key</label>
+                        <input type="text" id="code" name="code" class="form-input" placeholder="Enter your application key" required>
+                        <div id="code-error" class="form-error">Application key is required</div>
+                        <div class="form-hint">You can find this in your email provider's security settings</div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="submit-btn">
+                            <span class="loading" id="loading-spinner"></span>
+                            <svg class="btn-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M22 2L11 13"></path>
+                                <path d="M22 2L15 22L11 13L2 9L22 2Z"></path>
+                            </svg>
+                            Connect Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast" class="toast">
+        <div class="toast-icon" id="toast-icon">
+            <!-- Icon will be inserted by JS -->
+        </div>
+        <div class="toast-content">
+            <div class="toast-title" id="toast-title">Notification</div>
+            <div class="toast-message" id="toast-message"></div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('add-mail-form');
+            const emailInput = document.getElementById('email');
+            const codeInput = document.getElementById('code');
+            const emailError = document.getElementById('email-error');
+            const codeError = document.getElementById('code-error');
+            const submitBtn = document.getElementById('submit-btn');
+            const loadingSpinner = document.getElementById('loading-spinner');
+            const toast = document.getElementById('toast');
+            const toastIcon = document.getElementById('toast-icon');
+            const toastTitle = document.getElementById('toast-title');
+            const toastMessage = document.getElementById('toast-message');
+
+            // Validate email
+            function validateEmail(email) {
+                const re = /^(([^<>()\[\]\\.,;:\s@@"]+(\.[^<>()\[\]\\.,;:\s@@"]+)*)|(".+"))@@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                return re.test(String(email).toLowerCase());
+            }
+
+            // Show toast notification
+            function showToast(title, message, type = 'success') {
+                toastTitle.textContent = title;
+                toastMessage.textContent = message;
+                
+                // Set icon based on type
+                if (type === 'success') {
+                    toastIcon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                        </svg>
+                    `;
+                } else {
+                    toastIcon.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="12" y1="8" x2="12" y2="12"></line>
+                            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                        </svg>
+                    `;
+                }
+                
+                toast.className = `toast ${type} show`;
+                
+                setTimeout(() => {
+                    toast.className = 'toast';
+                }, 5000);
+            }
+
+            // Form submission
+            form.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Reset errors
+                emailInput.classList.remove('error');
+                codeInput.classList.remove('error');
+                emailError.classList.remove('visible');
+                codeError.classList.remove('visible');
+                
+                let isValid = true;
+                
+                // Validate email
+                if (!validateEmail(emailInput.value)) {
+                    emailInput.classList.add('error');
+                    emailError.classList.add('visible');
+                    isValid = false;
+                }
+                
+                // Validate code
+                if (codeInput.value.trim() === '') {
+                    codeInput.classList.add('error');
+                    codeError.classList.add('visible');
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    // Show loading state
+                    submitBtn.disabled = true;
+                    loadingSpinner.style.display = 'inline-block';
+                    
+                    // Submit form using fetch
+                    fetch('/api/filters/add-mail', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                        },
+                        body: new URLSearchParams({
+                            'email': emailInput.value,
+                            'code': codeInput.value
+                        })
+                    })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response;
+                    })
+                    .then(() => {
+                        showToast('Success', 'Mail account connected successfully', 'success');
+                        
+                        // Reset form
+                        form.reset();
+                        
+                        // Redirect after a delay (optional)
+                        setTimeout(() => {
+                            window.location.href = '/'; // Redirect to home or filters page
+                        }, 2000);
+                    })
+                    .catch(error => {
+                        showToast('Error', 'Failed to connect mail account. Please try again.', 'error');
+                        console.error('Error:', error);
+                    })
+                    .finally(() => {
+                        // Reset loading state
+                        submitBtn.disabled = false;
+                        loadingSpinner.style.display = 'none';
+                    });
+                }
+            });
+
+            // Real-time validation
+            emailInput.addEventListener('blur', function() {
+                if (this.value && !validateEmail(this.value)) {
+                    this.classList.add('error');
+                    emailError.classList.add('visible');
+                } else {
+                    this.classList.remove('error');
+                    emailError.classList.remove('visible');
+                }
+            });
+
+            codeInput.addEventListener('blur', function() {
+                if (this.value.trim() === '') {
+                    this.classList.add('error');
+                    codeError.classList.add('visible');
+                } else {
+                    this.classList.remove('error');
+                    codeError.classList.remove('visible');
+                }
+            });
+        });
+    </script>
+</body>
+</html>

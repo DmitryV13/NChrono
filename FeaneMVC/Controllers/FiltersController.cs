@@ -199,4 +199,27 @@ namespace FeaneMVC.Controllers
     {
         public string content { get; set; }
     }
+
+    [HttpGet("add-mail")]
+    public IActionResult AddMail()
+    {
+        return View();
+    }
+
+    [HttpPost("add-mail")]
+    public IActionResult AddMail([FromForm] string email, [FromForm] string code)
+    {
+        var userId = _sessionService.GetUserId();
+        var user = _context.Users.FirstOrDefault(u => u.Id == userId);
+        if (user != null)
+        {
+            MailCheck mailCheck = new MailCheck();
+            mailCheck.Email = email;
+            mailCheck.Code = code;
+            mailCheck.UserId = userId;
+            _context.MailChecks.Add(mailCheck);
+            _context.SaveChanges();
+        }
+        return Ok();
+    }
 }

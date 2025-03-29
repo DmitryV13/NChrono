@@ -6,7 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FeaneMVC.Migrations
 {
     /// <inheritdoc />
+<<<<<<<< HEAD:FeaneMVC/Migrations/20250328230943_newd.cs
     public partial class newd : Migration
+========
+    public partial class start111 : Migration
+>>>>>>>> 0c7dd5365b0b635d4a742dd3d0c4013a4c6b0a9c:FeaneMVC/Migrations/20250328215905_start111.cs
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -150,6 +154,27 @@ namespace FeaneMVC.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "MailChecks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Code = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_MailChecks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_MailChecks_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "Reservations",
                 columns: table => new
                 {
@@ -275,6 +300,11 @@ namespace FeaneMVC.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_MailChecks_UserId",
+                table: "MailChecks",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Reservations_UserId",
                 table: "Reservations",
                 column: "UserId");
@@ -298,6 +328,9 @@ namespace FeaneMVC.Migrations
 
             migrationBuilder.DropTable(
                 name: "DeliveryAddresses");
+
+            migrationBuilder.DropTable(
+                name: "MailChecks");
 
             migrationBuilder.DropTable(
                 name: "PaymentDetails");
