@@ -202,7 +202,7 @@ namespace FeaneMVC.Controllers
             _sessionService.SetSession("IsUserLoggedIn", "true");
             ViewBag.UserName = data.Credential;
 
-            return RedirectToAction("Profile");
+            return RedirectToAction("Index", "Home");
         }
 
         // GET: /Account/Logout
