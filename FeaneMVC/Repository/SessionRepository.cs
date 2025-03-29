@@ -1,17 +1,11 @@
-﻿using Azure.Core;
+﻿using System.ComponentModel.DataAnnotations;
 using FinalProject.DbModel;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 using WebApplication1.Helpers;
-using WebApplication1.Interfaces;
 using WebApplication1.Models;
 using ISession = WebApplication1.Interfaces.ISession;
 
-namespace WebApplication1.Repository
+namespace FeaneMVC.Repository
 {
     public class SessionRepository : ISession
     {

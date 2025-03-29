@@ -1,36 +1,26 @@
 ﻿using FinalProject.DbModel;
-using FinalProject.Models;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 using WebApplication1.Controllers;
-using WebApplication1.Helpers;
 using WebApplication1.Interfaces;
 using WebApplication1.Models;
 using WebApplication1.Models.Enums;
-using WebApplication1.Models.Response;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
-namespace SummerWork.WebApi.Controllers
+namespace FeaneMVC.Controllers
 {
     public class AccountController :Controller
     {
         private readonly ILogger<HomeController> _logger;
         private readonly WebApplication1.Interfaces.ISession _sessionService;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly ICartService _cartService;
         private readonly IUSer _user;
-        private readonly IReservation _reservation;
         private readonly ApplicationDbContext _dbContext;
 
         // Constructor to initialize dependencies
-        public AccountController(IReservation reservation, WebApplication1.Interfaces.ISession sessionService, IHttpContextAccessor httpContextAccessor, ICartService cartService, IUSer user, ApplicationDbContext dbContext)        
+        public AccountController(WebApplication1.Interfaces.ISession sessionService, IHttpContextAccessor httpContextAccessor, IUSer user, ApplicationDbContext dbContext)        
         {
-            _reservation = reservation;
             _dbContext = dbContext;
             _sessionService = sessionService;
             _httpContextAccessor = httpContextAccessor;
-            _cartService = cartService;
             _user = user;
         }
 
@@ -53,8 +43,7 @@ namespace SummerWork.WebApi.Controllers
             if (user != null && user.Status)
             {
                 // If the user is active, get the reservation history and pass it to the view
-                var reservHistory = _reservation.GetAllReservations();
-                return View(reservHistory);
+                return View();
             }
             else
             {
@@ -93,26 +82,6 @@ namespace SummerWork.WebApi.Controllers
             return View();
         }
 
-        // GET: /Account/Addresses
-        public async Task<IActionResult> Addresses()
-        {
-            Guid userId = _sessionService.GetUserId();
-
-
-
-
-            var addressResponse = await _user.GetOneAddressByUserIdAsync(userId);
-
-            if (addressResponse.Success)
-            {
-                return View(addressResponse.DeliveryAddress);
-            }
-            else
-            {
-                return RedirectToAction("Authentication");
-            }
-
-        }
 
         // POST: /Account/UpdateContacts
         [HttpPost]
@@ -139,29 +108,6 @@ namespace SummerWork.WebApi.Controllers
         }
 
 
-        // POST: /Account/UpdateAddress
-        [HttpPost]
-        public async Task<JsonResult> UpdateAddress(DeliveryAddress data)
-        {
-            Guid userId = _sessionService.GetUserId();
-
-
-            var userResponse = await _user.GetOneUserByIdAsync(userId);
-
-            if (!userResponse.Status)
-            {
-                return Json(new { success = false, message = userResponse.Message });
-            }
-
-            var updateResponse = await _user.UpdateAddress(userResponse.User, data);
-
-            if (!updateResponse.Status)
-            {
-                return Json(new { success = false, message = updateResponse.Message });
-            }
-
-            return Json(new { success = true, message = "User updated successfully.", user = updateResponse.User });
-        }
 
         // GET: /Account/ForgotPassword
         public IActionResult ForgotPassword()
