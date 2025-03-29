@@ -125,7 +125,7 @@ namespace FeaneMVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Dishes");
+                    b.ToTable("Dish");
                 });
 
             modelBuilder.Entity("FinalProject.Models.Reservation", b =>

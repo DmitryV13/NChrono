@@ -12,7 +12,7 @@ namespace FinalProject.DbModel
         {
         }
 
-        public DbSet<Dish> Dishes { get; set; }
+
         public DbSet<Reservation> Reservations { get; set; }
         public DbSet<UserData> Users { get; set; }
         public DbSet<ReservationHistory> ReservationsHistory { get; set; }

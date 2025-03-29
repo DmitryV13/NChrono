@@ -6,13 +6,13 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace FeaneMVC.Migrations
 {
     /// <inheritdoc />
-    public partial class start1 : Migration
+    public partial class newd : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Dishes",
+                name: "Dish",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
@@ -26,7 +26,7 @@ namespace FeaneMVC.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Dishes", x => x.Id);
+                    table.PrimaryKey("PK_Dish", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -239,9 +239,9 @@ namespace FeaneMVC.Migrations
                         principalColumn: "CartId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_CartItem_Dishes_DishId",
+                        name: "FK_CartItem_Dish_DishId",
                         column: x => x.DishId,
-                        principalTable: "Dishes",
+                        principalTable: "Dish",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
@@ -321,7 +321,7 @@ namespace FeaneMVC.Migrations
                 name: "Cart");
 
             migrationBuilder.DropTable(
-                name: "Dishes");
+                name: "Dish");
 
             migrationBuilder.DropTable(
                 name: "Users");

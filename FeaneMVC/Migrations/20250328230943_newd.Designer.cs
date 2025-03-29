@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FeaneMVC.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20250328201151_start1")]
-    partial class start1
+    [Migration("20250328230943_newd")]
+    partial class newd
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -128,7 +128,7 @@ namespace FeaneMVC.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Dishes");
+                    b.ToTable("Dish");
                 });
 
             modelBuilder.Entity("FinalProject.Models.Reservation", b =>
