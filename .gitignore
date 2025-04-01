@@ -361,3 +361,10 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+
+FeaneMVC/appsettings.json
+
+.idea/.idea.FeaneMVC/.idea/dataSources.xml
+
+.config/*

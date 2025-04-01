@@ -1,16 +1,339 @@
 ﻿@{
     Layout = "_Layout";
+    ViewData["Title"] = "Home";
 }
 
-<!DOCTYPE html>
-<html>
+<div class="home-container">
+    <section class="welcome-section">
+        <div class="container">
+            <div class="welcome-content">
+                <h1 class="welcome-title">Welcome to NChrono</h1>
+                <p class="welcome-description">
+                    Manage your emails efficiently with our powerful filtering system.
+                    Organize, categorize, and never miss important messages again.
+                </p>
+            </div>
+        </div>
+    </section>
 
+    <section class="features-section">
+        <div class="container">
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M22 12h-4l-3 9L9 3l-3 9H2"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Email Filters</h3>
+                    <p class="feature-description">
+                        Create custom filters to automatically organize your incoming emails.
+                    </p>
+                    <a href="@Url.Action("Index", "Filters")" class="feature-link">
+                        Manage Filters
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
 
-<body>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path>
+                            <path d="M22 10a3 3 0 0 0-3-3h-2.207a5.502 5.502 0 0 0-10.702.5"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Weather Forecast</h3>
+                    <p class="feature-description">
+                        Get real-time weather updates and forecasts for your location and favorite cities.
+                    </p>
+                    <a href="@Url.Action("Index", "Weather")" class="feature-link">
+                        Check Weather
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
 
-  
-  
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                            <polyline points="22,6 12,13 2,6"></polyline>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Add Email Account</h3>
+                    <p class="feature-description">
+                        Connect your email accounts to start filtering and organizing your messages.
+                    </p>
+                    <a href="@Url.Action("AddMail", "Filters")" class="feature-link">
+                        Add Email Account
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
 
-</body>
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">View Messages</h3>
+                    <p class="feature-description">
+                        Access all your filtered emails and messages in a clean, organized interface.
+                    </p>
+                    <a href="@Url.Action("Index", "Mail")" class="feature-link">
+                        View Mail
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="5" y1="12" x2="19" y2="12"></line>
+                            <polyline points="12 5 19 12 12 19"></polyline>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
 
-</html>
+    <section class="cta-section">
+        <div class="container">
+            <div class="cta-content">
+                <h2 class="cta-title">Ready to get started?</h2>
+                <p class="cta-description">
+                    Connect your email account and start organizing your inbox today.
+                </p>
+                <div class="cta-buttons">
+                    <a href="@Url.Action("AddMail", "Filters")" class="cta-button primary">
+                        Add Email Account
+                    </a>
+                    <a href="@Url.Action("Index", "Filters")" class="cta-button secondary">
+                        Explore Filters
+                    </a>
+                    <a href="@Url.Action("FilterPage", "Filters")" class="cta-button secondary">
+                        Notification Groups
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+</div>
+
+<style>
+    /* Home Page Styles */
+    .home-container {
+        padding-bottom: 4rem;
+    }
+
+    /* Welcome Section */
+    .welcome-section {
+        padding: 4rem 0;
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+        text-align: center;
+    }
+
+    .welcome-content {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .welcome-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .welcome-description {
+        font-size: 1.25rem;
+        opacity: 0.9;
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 4rem 0;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 2rem;
+    }
+
+    .feature-card {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .feature-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .feature-icon {
+        width: 60px;
+        height: 60px;
+        background-color: rgba(99, 102, 241, 0.1);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 1.5rem;
+        color: #6366f1;
+    }
+
+    .feature-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        color: #1e293b;
+    }
+
+    .feature-description {
+        color: #64748b;
+        margin-bottom: 1.5rem;
+        flex-grow: 1;
+    }
+
+    .feature-link {
+        display: inline-flex;
+        align-items: center;
+        color: #6366f1;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        gap: 0.5rem;
+    }
+
+    .feature-link:hover {
+        color: #4f46e5;
+    }
+
+    .feature-link svg {
+        transition: transform 0.3s ease;
+    }
+
+    .feature-link:hover svg {
+        transform: translateX(5px);
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 4rem 0;
+        background-color: #f8fafc;
+        text-align: center;
+    }
+
+    .cta-content {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    .cta-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        color: #1e293b;
+    }
+
+    .cta-description {
+        color: #64748b;
+        margin-bottom: 2rem;
+    }
+
+    .cta-buttons {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .cta-button {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        text-decoration: none;
+        transition: all 0.3s ease;
+    }
+
+    .cta-button.primary {
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+        color: white;
+    }
+
+    .cta-button.primary:hover {
+        box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .cta-button.secondary {
+        background-color: white;
+        color: #6366f1;
+        border: 1px solid #6366f1;
+    }
+
+    .cta-button.secondary:hover {
+        background-color: rgba(99, 102, 241, 0.1);
+    }
+
+    /* Responsive Styles */
+    @@media (max-width: 768px) {
+    .welcome-title {
+        font-size: 2rem;
+    }
+
+    .welcome-description {
+        font-size: 1rem;
+    }
+
+    .cta-title {
+        font-size: 1.75rem;
+    }
+    }
+
+    /* Dark Mode Support */
+    @@media (prefers-color-scheme: dark) {
+    .feature-card {
+        background-color: #1e293b;
+    }
+
+    .feature-title {
+        color: #f1f5f9;
+    }
+
+    .feature-description {
+        color: #94a3b8;
+    }
+
+    .cta-section {
+        background-color: #0f172a;
+    }
+
+    .cta-title {
+        color: #f1f5f9;
+    }
+
+    .cta-description {
+        color: #94a3b8;
+    }
+
+    .cta-button.secondary {
+        background-color: #1e293b;
+        border-color: #6366f1;
+    }
+    }
+</style>

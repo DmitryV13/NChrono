@@ -1,6 +1,6 @@
-﻿using FinalProject.Models;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
+using FeaneMVC.Models;
 using WebApplication1.Models.Enums;
 using WebApplication1.Models.Response;
 
@@ -12,7 +12,6 @@ namespace WebApplication1.Models
         public Guid Id { get; set; }
 
         public Guid CartId { get; set; }
-        public virtual Cart Cart { get; set; } // Навигационное свойство
 
         [Required]
         public string Username { get; set; }
@@ -45,6 +44,9 @@ namespace WebApplication1.Models
 
         // Связь с DeliveryAddress
         public Guid DeliveryId { get; set; }
-        public virtual DeliveryAddress Delivery { get; set; } // Навигационное свойство
+        public virtual ICollection<UserFilter> Filters { get; set; }
+        public ICollection<MailCheck> MailChecks { get; set; } = new List<MailCheck>();
+        
+        public ICollection<Notification> Notifications { get; set; } = new List<Notification>();
     }
 }
